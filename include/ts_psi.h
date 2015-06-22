@@ -128,10 +128,13 @@ void init_ts_psi_list(void);
 
 int parse_ts_packet_header(TS_PACKET_HEADER *packet_head, unsigned char *buffer);
 
-int parse_pat_table(unsigned char * PBuffer,TS_PACKET_HEADER *ptsPacketHeader, TS_PAT_TABLE * psiPAT);
+int find_given_table(FILE *pFile, unsigned char *storeBuffer, 
+        unsigned int mPacketLength, unsigned int mUserPid);
+
+int parse_pat_table(unsigned char * pBuffer,TS_PAT_TABLE * psiPAT);
 
 int parse_pmt_table (unsigned char * pBuffer,unsigned int programNumber,
-        TS_PACKET_HEADER * ptsPacketHeader, TS_PMT_TABLE * psiPMT); 
+        TS_PMT_TABLE * psiPMT);  
 
 unsigned char * deal_with_given_table(TS_PACKET_HEADER *packet_head, unsigned char *buffer, unsigned int packetLength);
 

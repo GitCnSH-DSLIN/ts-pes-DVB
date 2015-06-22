@@ -8,14 +8,18 @@ int main(int argc, char * argv[])
 {
    
     FILE *pFile, *pSaveFile;
-    TS_PACKET_HEADER mtsPacketHeader;
+    //TS_PACKET_HEADER mtsPacketHeader;
     TS_PAT_TABLE mtsPatTable;
     TS_PMT_TABLE mtsPmtTable;
-    unsigned char tmpPacketBuffer[188] = {'\0'};
+    //unsigned char tmpPacketBuffer[188] = {'\0'};
     unsigned int packetLength = TS_PACKET_SIZE;
     unsigned int searchProgramId, programUserPid;
     unsigned char storeIdStream[20]={'\0'};
     int ret;
+    int iCount = 0;
+    
+    unsigned char * tmpPacketBuffer = (unsigned char *)malloc(4096);
+    memset(tmpPacketBuffer,'\0',4096);
 
     if((pFile = fopen("ocn_203.ts","rb")) == NULL)
     {
@@ -24,15 +28,18 @@ int main(int argc, char * argv[])
     }
     init_ts_psi_list();    
 
-    ret = find_given_table(pFile, tmpPacketBuffer, packetLength,
-            &mtsPacketHeader, PID_TS_PAT);
+    ret = find_given_table(pFile, tmpPacketBuffer, packetLength, PID_TS_PAT);
     if(-1 == ret)
     {
         uprintf("Can't find given table\n");
         return -1;
     }
 
-    parse_pat_table(tmpPacketBuffer, &mtsPacketHeader, &mtsPatTable);
+    for(iCount = 0; iCount < ret; iCount++)
+    {
+        parse_pat_table(tmpPacketBuffer + packetLength*iCount, &mtsPatTable);
+    }
+    
     setup_pmt_stream_list(pFile, packetLength);
 
     /**************************************************************************/
@@ -44,8 +51,7 @@ int main(int argc, char * argv[])
 
     programUserPid = search_given_program_info(searchProgramId);
     
-    ret = find_given_table(pFile, tmpPacketBuffer, packetLength,
-            &mtsPacketHeader, programUserPid);
+    ret = find_given_table(pFile, tmpPacketBuffer, packetLength, programUserPid);
     
     if(-1 == ret)
     {
@@ -53,8 +59,11 @@ int main(int argc, char * argv[])
         return -1;
     }
 
-    parse_pmt_table(tmpPacketBuffer,searchProgramId, &mtsPacketHeader, &mtsPmtTable);
 
+    for(iCount = 0; iCount < ret; iCount++)
+    {
+        parse_pmt_table(tmpPacketBuffer + packetLength*iCount, searchProgramId, &mtsPmtTable);
+    }
     /**************************************************************************/
     printf("\nInput the elementary_PID to store :");
     scanf("%s",storeIdStream);

@@ -145,8 +145,7 @@ unsigned int locate_offset(TS_PACKET_HEADER *packet_head, unsigned char *buffer,
  *  Function    : Parse the pat table and add the pat_program info into
  *                global list------ts_pat_program_list
  */
-int parse_pat_table(unsigned char * pBuffer, TS_PACKET_HEADER *ptsPacketHeader,
-        TS_PAT_TABLE * psiPAT)
+int parse_pat_table(unsigned char * pBuffer,TS_PAT_TABLE * psiPAT)
 {
 
     int pat_len = 0;
@@ -154,6 +153,11 @@ int parse_pat_table(unsigned char * pBuffer, TS_PACKET_HEADER *ptsPacketHeader,
     int ret=0, n = 0;
     P_TS_PAT_Program tmp = NULL;
     unsigned int pes_start;
+    
+    TS_PACKET_HEADER tsPacketHeader;
+    P_TS_PACKET_HEADER ptsPacketHeader = &tsPacketHeader;
+
+    parse_ts_packet_header(ptsPacketHeader, pBuffer);
 
     unsigned int offset = locate_offset(ptsPacketHeader, pBuffer, 0, &pes_start);
     unsigned char * buffer = pBuffer + offset;
@@ -240,12 +244,16 @@ int show_pat_program_info(void)
  *                global list------ts_pmt_stream_list
  */
 int parse_pmt_table (unsigned char * pBuffer,unsigned int programNumber,
-        TS_PACKET_HEADER * ptsPacketHeader,TS_PMT_TABLE * psiPMT)  
+        TS_PMT_TABLE * psiPMT)  
 {   
     int pmt_len;
     int pos_offset;
     P_TS_PMT_Stream tmp,freetmp;
     unsigned int pes_start;
+    TS_PACKET_HEADER tsPacketHeader;
+    P_TS_PACKET_HEADER ptsPacketHeader = &tsPacketHeader;
+    parse_ts_packet_header(ptsPacketHeader, pBuffer);
+
     unsigned int offset = locate_offset(ptsPacketHeader,pBuffer, 0, &pes_start);
     unsigned char * buffer = pBuffer + offset;
     struct list_head *pos;
@@ -380,13 +388,12 @@ int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength)
         
     unsigned char * pPacketBuffer = (unsigned char *)malloc(packetLength);
     unsigned char * pFreebuffer = pPacketBuffer;
-    TS_PACKET_HEADER mtsPacketHeader;
 
     list_for_each(pos, &__ts_pat_program_list.list)
     {
         tmp_pat_program = list_entry(pos,TS_PAT_Program, list);
-        find_given_table(pFile, pPacketBuffer, packetLength, &mtsPacketHeader, tmp_pat_program->program_map_pid);
-        parse_pmt_table(pPacketBuffer, tmp_pat_program->program_number, &mtsPacketHeader, &mtsPmtTable); 
+        find_given_table(pFile, pPacketBuffer, packetLength, tmp_pat_program->program_map_pid);
+        parse_pmt_table(pPacketBuffer, tmp_pat_program->program_number, &mtsPmtTable); 
     }
 
     show_pmt_stream_info();
@@ -406,21 +413,49 @@ int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength)
  *  Function    : Find the given table on the basis mUserPid.
  *  Description : 1. when find, copy the given table to storeBuffer.
  *                2. store the given table header to ptsPacketHeader.
+ *  Note        : because some table use some sections to store it.
+ *                So we need store a total table. 
+ *                This function can't use to find pes data.
  */
-int find_given_table(FILE *pFile, unsigned char *storeBuffer, unsigned int mPacketLength,
-        P_TS_PACKET_HEADER ptsPacketHeader, unsigned int mUserPid)
+int find_given_table(FILE *pFile, unsigned char *storeBuffer, 
+        unsigned int mPacketLength, unsigned int mUserPid)
 {
     int ret = -1;
+    unsigned int offsetLength = 0;
+    unsigned int sectionNumber = 0,lastSectionNumber = 0;
+    unsigned char * tmpbuffer = (unsigned char *)malloc(mPacketLength);
+    unsigned char *ptmpbuffer = tmpbuffer;
+    unsigned int sectionCount = 0;
+    unsigned int pes_start;
 
-    while((fread(storeBuffer, mPacketLength, 1, pFile) == 1))
+    TS_PACKET_HEADER tsPacketHeader;
+    P_TS_PACKET_HEADER ptsPacketHeader = &tsPacketHeader;
+
+    while((fread(tmpbuffer, mPacketLength, 1, pFile) == 1))
     {
-        parse_ts_packet_header(ptsPacketHeader, storeBuffer);
+        parse_ts_packet_header(ptsPacketHeader, tmpbuffer);
         
         if (mUserPid == ptsPacketHeader->pid)
         {
-            ret = 0;
-//            uprintf("We find the given table\n");
-            break;
+            offsetLength = locate_offset(ptsPacketHeader, tmpbuffer, 1, &pes_start);
+            sectionNumber = tmpbuffer[offsetLength + 7];
+            lastSectionNumber = tmpbuffer[offsetLength + 8];
+            
+            ret = lastSectionNumber+1;//we divide the table into ret section. 
+
+            if(0 == lastSectionNumber)
+            {
+                memcpy(storeBuffer, tmpbuffer, mPacketLength);
+                break;
+            }
+            
+            if(sectionCount <= lastSectionNumber)
+            {
+                memcpy(storeBuffer[sectionNumber], tmpbuffer, mPacketLength);
+                sectionCount++;
+                if(sectionNumber == lastSectionNumber && sectionCount == lastSectionNumber + 1)
+                    break;
+            }
         }
     }
 
@@ -431,6 +466,7 @@ int find_given_table(FILE *pFile, unsigned char *storeBuffer, unsigned int mPack
     }
     //return to the SEEK_SET position of pFile.
     fseek(pFile, 0, SEEK_SET);
+    free(ptmpbuffer);
 
     return ret;
 }
