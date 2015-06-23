@@ -434,7 +434,7 @@ int find_given_table(FILE *pFile, unsigned char *storeBuffer,
     while((fread(tmpbuffer, mPacketLength, 1, pFile) == 1))
     {
         parse_ts_packet_header(ptsPacketHeader, tmpbuffer);
-        
+
         if (mUserPid == ptsPacketHeader->pid)
         {
             offsetLength = locate_offset(ptsPacketHeader, tmpbuffer, 1, &pes_start);
@@ -471,6 +471,107 @@ int find_given_table(FILE *pFile, unsigned char *storeBuffer,
     return ret;
 }
 
+/*  
+ *  Function    : Find the given table on the basis mUserPid.
+ *  Description : 1. when find, copy the given table to storeBuffer.
+ *                2. store the given table header to ptsPacketHeader.
+ *  Note        : because some table use some sections to store it.
+ *                So we need store a total table. 
+ *                This function can't use to find pes data.
+ *
+ *                For SDT table . with more sections situation. Need to deal with.
+ */
+
+
+int find_given_table_more(FILE *pFile, unsigned char *storeBuffer, 
+        unsigned int mPacketLength, unsigned int mUserPid,unsigned int tableId)
+{
+    int ret = -1;
+    unsigned int offsetLength = 0;
+    unsigned int sectionNumber = 0,lastSectionNumber = 0;
+    unsigned char * tmpbuffer = (unsigned char *)malloc(mPacketLength);
+    unsigned char *ptmpbuffer = tmpbuffer;
+    unsigned char *pstoreBuffer = storeBuffer;
+    unsigned int section_length = 0;
+    unsigned int continuity_counter = 0;
+    unsigned int pes_start;
+
+    unsigned int copy_loop_total = 0;
+    unsigned int copy_count = 0;
+
+    TS_PACKET_HEADER tsPacketHeader;
+    P_TS_PACKET_HEADER ptsPacketHeader = &tsPacketHeader;
+
+    while((fread(tmpbuffer, mPacketLength, 1, pFile) == 1))
+    {
+        parse_ts_packet_header(ptsPacketHeader, tmpbuffer);
+
+        offsetLength = locate_offset(ptsPacketHeader, tmpbuffer, 1, &pes_start);
+        
+        //distinguish the SDT BAT ST
+        if (mUserPid == ptsPacketHeader->pid && tableId == tmpbuffer[offsetLength + 1])
+        {
+            ret = 1;
+            continuity_counter = ptsPacketHeader->continuity_counter;
+
+            section_length = ((tmpbuffer[offsetLength + 2] & 0x0f)<<8) | (tmpbuffer[offsetLength + 3]);
+            //uprintf("the value of section_length is  0x%x\n",section_length);
+
+
+            //3 meaning before section_length bytes.    
+            copy_loop_total = (section_length + 3 + offsetLength) / mPacketLength;
+            //uprintf("the value of copy_loop_total is  %d\n",copy_loop_total);
+
+
+            if(0 == copy_loop_total)
+                memcpy(storeBuffer, &ptmpbuffer[0], mPacketLength);
+            else
+            {
+                for (; copy_count <= copy_loop_total;)
+                {
+                    if(0 == copy_count)
+                    {
+                        memcpy(pstoreBuffer, &ptmpbuffer[0], mPacketLength);
+                        copy_count++;
+                        pstoreBuffer += mPacketLength;
+                    }
+                    else
+                    {
+                        if(fread(tmpbuffer, mPacketLength, 1, pFile) !=1 )
+                            fseek(pFile, 0, SEEK_SET);
+                        parse_ts_packet_header(ptsPacketHeader, tmpbuffer);
+                        offsetLength = locate_offset(ptsPacketHeader, tmpbuffer, 1, &pes_start);
+
+                        if(mUserPid == ptsPacketHeader->pid && ptsPacketHeader->continuity_counter == continuity_counter + copy_count) 
+                        {
+                        # if 0
+                            uprintf("the value of copy_count is %d\n",copy_count);
+                            uprintf("the value of continuity_counter is %d\n",continuity_counter);
+                            uprintf("the value of ptsPacketHeader->continuity_counter is %d\n",ptsPacketHeader->continuity_counter);
+                        #endif
+                            memcpy(pstoreBuffer,tmpbuffer+offsetLength, mPacketLength-offsetLength);
+                            copy_count++;
+                            pstoreBuffer += mPacketLength-offsetLength;
+                        }
+                    }
+                }
+            }
+            break;
+        }
+    }
+
+
+    
+    if(ret == -1)
+    {
+        uprintf("Can't find the given table\n");
+    }
+    //return to the SEEK_SET position of pFile.
+    fseek(pFile, 0, SEEK_SET);
+    free(ptmpbuffer);
+
+    return ret;
+}
 
 
 int search_given_program_info(unsigned int searchProgramId)

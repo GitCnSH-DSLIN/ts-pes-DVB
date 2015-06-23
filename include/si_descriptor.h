@@ -9,19 +9,18 @@
 #ifndef  _MPEG_SI_DESCRITPOR_H_
 #define  _MPEG_SI_DESCRIPTOR_H_
 
-struct CA_identifier_descriptor{
+typedef struct CA_identifier_descriptor{
     unsigned char descriptor_tag;
     unsigned char descriptor_length;
     unsigned short * CA_system_id;
     void * next_desc;
-};
+}CA_IDENTIFIER_DESC, *P_CA_IDENTIFIER_DESC;
 
 
-#define NETWORKNAME_DESC_TAG(b)			(b[0])
-#define NETWORKNAME_DESC_LENGTH(b)		(b[1])
+int decode_CA_identifier_desc(byte* byteptr, int this_section_length,
+        P_CA_IDENTIFIER_DESC * pCaIdentifier_desc);
 
-int decode_network_name_desc(byte* byteptr, int this_section_length,NetworkNameDesc* desc_network_name);
-void free_network_name_desc(NetworkNameDesc* head);
+void free_CA_identifier_desc(pCaIdentifier_desc * head);
 
 
 #endif

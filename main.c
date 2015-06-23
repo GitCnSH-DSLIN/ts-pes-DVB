@@ -3,6 +3,9 @@
 #include <ts_psi.h>
 #include <ts_list.h>
 #include <print_debug.h>
+#include <sdt.h>
+
+#define BUFFER_SIZE     (4096)
 
 int main(int argc, char * argv[])
 {
@@ -18,8 +21,8 @@ int main(int argc, char * argv[])
     int ret;
     int iCount = 0;
     
-    unsigned char * tmpPacketBuffer = (unsigned char *)malloc(4096);
-    memset(tmpPacketBuffer,'\0',4096);
+    unsigned char * tmpPacketBuffer = (unsigned char *)malloc(BUFFER_SIZE);
+    memset(tmpPacketBuffer,'\0', BUFFER_SIZE);
 
     if((pFile = fopen("ocn_203.ts","rb")) == NULL)
     {
@@ -28,6 +31,8 @@ int main(int argc, char * argv[])
     }
     init_ts_psi_list();    
 
+    /*************************************************************************/
+#if 0
     ret = find_given_table(pFile, tmpPacketBuffer, packetLength, PID_TS_PAT);
     if(-1 == ret)
     {
@@ -41,8 +46,9 @@ int main(int argc, char * argv[])
     }
     
     setup_pmt_stream_list(pFile, packetLength);
-
+#endif
     /**************************************************************************/
+#if 0
     printf("\nInput your service id(program_number): ");
     if(1 != scanf("%d",&searchProgramId))
     {
@@ -64,7 +70,30 @@ int main(int argc, char * argv[])
     {
         parse_pmt_table(tmpPacketBuffer + packetLength*iCount, searchProgramId, &mtsPmtTable);
     }
+
+#endif
     /**************************************************************************/
+    TS_SDT_TABLE mtsSdtTable;
+
+    ret = find_given_table_more(pFile, tmpPacketBuffer, packetLength, PID_TS_SI_SDT, TABLE_ID_SDT_OTHER);
+
+    if(-1 == ret)
+    {
+        uprintf("Can't find the SDT table\n");
+        return -1;
+    }
+    uprintf("the value of ret is %d\n",ret);
+
+
+    for(iCount = 0; iCount < ret; iCount++)
+    {
+        parse_sdt_table(tmpPacketBuffer + packetLength*iCount,packetLength, &mtsSdtTable);
+    }
+
+
+
+    /**************************************************************************/
+#if 0
     printf("\nInput the elementary_PID to store :");
     scanf("%s",storeIdStream);
 
@@ -76,9 +105,12 @@ int main(int argc, char * argv[])
 
     ret = store_pes_stream(pFile,pSaveFile,packetLength,
             atoi(storeIdStream));
-
+#endif
+    /**************************************************************************/
 	fclose(pFile);
-    fclose(pSaveFile);
+    //fclose(pSaveFile);
+
+    free(tmpPacketBuffer);
 
     return 0;
 }

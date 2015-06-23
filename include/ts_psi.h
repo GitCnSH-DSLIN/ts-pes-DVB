@@ -18,7 +18,6 @@
 #define	PID_TS_PAT				(0x00)
 #define	PID_TS_CAT				(0x01)	//Conditional Accept Table
 //TSDT -- Transport Stream Description Table
-#define	PID_TS_SDT 			    (0x02)
 #define	PID_TS_NULL			    (0x1FFF)
 
 #define PACKET_START_CODE_PREFIX        (0x000001)
@@ -130,6 +129,8 @@ int parse_ts_packet_header(TS_PACKET_HEADER *packet_head, unsigned char *buffer)
 
 int find_given_table(FILE *pFile, unsigned char *storeBuffer, 
         unsigned int mPacketLength, unsigned int mUserPid);
+int find_given_table_more(FILE *pFile, unsigned char *storeBuffer, 
+        unsigned int mPacketLength, unsigned int mUserPid,unsigned int tableId);
 
 int parse_pat_table(unsigned char * pBuffer,TS_PAT_TABLE * psiPAT);
 
