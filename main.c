@@ -105,10 +105,10 @@ int main(int argc, char * argv[])
 
     ret = store_pes_stream(pFile,pSaveFile,packetLength,
             atoi(storeIdStream));
+    //fclose(pSaveFile);
 #endif
     /**************************************************************************/
 	fclose(pFile);
-    //fclose(pSaveFile);
 
     free(tmpPacketBuffer);
 
