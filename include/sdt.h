@@ -110,6 +110,7 @@ void* decode_desc(unsigned char* byteptr, int this_section_length);
 void free_desc(void* phead);
 void free_sdt_service(TS_SDT_TABLE * sdtService);
 void free_sdt(TS_SDT_TABLE * sdtTable);
+void show_sdt_table_info(TS_SDT_TABLE * pSdtTable);
 /***************************** End of SDT releated struction **********************/
 
 #endif   /* ----- #ifndef _MPEG_TS_SI_H_  ----- */

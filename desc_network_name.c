@@ -5,6 +5,8 @@
  *      Author: orion
  */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <desc_network_name.h>
 #include <print_debug.h>
 
@@ -17,11 +19,11 @@ int decode_network_name_desc(unsigned char * byteptr, int this_section_length,
 
 	desc_network_name->network_name = (char*)calloc(desc_network_name->descriptor_length + 1, sizeof(char));
 	strncpy(desc_network_name->network_name, (char*)&b[2], desc_network_name->descriptor_length);
-
+#if 0
 	uprintf("descriptor_tag:0x%x:\n",desc_network_name->descriptor_tag);
 	uprintf("descriptor_length:0x%x\n",desc_network_name->descriptor_length);
 	uprintf("network_name:%s\n",desc_network_name->network_name);
-
+#endif
 	return (desc_network_name->descriptor_length + 2);
 }
 

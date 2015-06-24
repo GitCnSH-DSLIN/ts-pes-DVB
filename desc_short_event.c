@@ -5,6 +5,8 @@
  *      Author: orion
  */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <desc_short_event.h>
 #include <print_debug.h>
 
@@ -21,7 +23,7 @@ int decode_short_evt_desc(unsigned char* byteptr, int this_section_length,
 	desc_short_event->text_length = SHORT_EVT_DESC_TEXT_LENGTH(b);
 	desc_short_event->text = (char *)calloc(desc_short_event->text_length + 1,sizeof(char));
 	strncpy(desc_short_event->text,(char*)&b[desc_short_event->event_name_length + 7],desc_short_event->text_length);
-
+#if 0
 	uprintf("desc_short_event->descriptor_tag:0x%x\n",desc_short_event->descriptor_tag);
 	uprintf("desc_short_event->descriptor_length:0x%x\n",desc_short_event->descriptor_length);
 	uprintf("desc_short_event->ISO_639_language_code:0x%x\n",desc_short_event->ISO_639_language_code);
@@ -29,7 +31,7 @@ int decode_short_evt_desc(unsigned char* byteptr, int this_section_length,
 	uprintf("desc_short_event->event_name:%s\n",desc_short_event->event_name);
 	uprintf("desc_short_event->text_length:0x%x\n",desc_short_event->text_length);
 	uprintf("desc_short_event->text:%s\n",desc_short_event->text);
-
+#endif
 	return (desc_short_event->descriptor_length + 2);
 }
 

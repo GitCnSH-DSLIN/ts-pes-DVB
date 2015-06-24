@@ -488,16 +488,11 @@ int find_given_table_more(FILE *pFile, unsigned char *storeBuffer,
 {
     int ret = -1;
     unsigned int offsetLength = 0;
-    unsigned int sectionNumber = 0,lastSectionNumber = 0;
+    //unsigned int sectionNumber = 0,lastSectionNumber = 0;
     unsigned char * tmpbuffer = (unsigned char *)malloc(mPacketLength);
-    unsigned char *ptmpbuffer = tmpbuffer;
     unsigned char *pstoreBuffer = storeBuffer;
-    unsigned int section_length = 0;
-    unsigned int continuity_counter = 0;
     unsigned int pes_start;
 
-    unsigned int copy_loop_total = 0;
-    unsigned int copy_count = 0;
 
     TS_PACKET_HEADER tsPacketHeader;
     P_TS_PACKET_HEADER ptsPacketHeader = &tsPacketHeader;
@@ -511,27 +506,27 @@ int find_given_table_more(FILE *pFile, unsigned char *storeBuffer,
         //distinguish the SDT BAT ST
         if (mUserPid == ptsPacketHeader->pid && tableId == tmpbuffer[offsetLength + 1])
         {
+
+            unsigned int copy_loop_total = 0;
+            unsigned int copy_count = 0;
+            unsigned int continuity_counter;
+            unsigned int section_length;
             ret = 1;
+
             continuity_counter = ptsPacketHeader->continuity_counter;
-
             section_length = ((tmpbuffer[offsetLength + 2] & 0x0f)<<8) | (tmpbuffer[offsetLength + 3]);
-            //uprintf("the value of section_length is  0x%x\n",section_length);
-
-
             //3 meaning before section_length bytes.    
             copy_loop_total = (section_length + 3 + offsetLength) / mPacketLength;
-            //uprintf("the value of copy_loop_total is  %d\n",copy_loop_total);
-
 
             if(0 == copy_loop_total)
-                memcpy(storeBuffer, &ptmpbuffer[0], mPacketLength);
+                memcpy(storeBuffer, tmpbuffer, mPacketLength);
             else
             {
                 for (; copy_count <= copy_loop_total;)
                 {
                     if(0 == copy_count)
                     {
-                        memcpy(pstoreBuffer, &ptmpbuffer[0], mPacketLength);
+                        memcpy(pstoreBuffer, tmpbuffer, mPacketLength);
                         copy_count++;
                         pstoreBuffer += mPacketLength;
                     }
@@ -568,7 +563,7 @@ int find_given_table_more(FILE *pFile, unsigned char *storeBuffer,
     }
     //return to the SEEK_SET position of pFile.
     fseek(pFile, 0, SEEK_SET);
-    free(ptmpbuffer);
+    free(tmpbuffer);
 
     return ret;
 }

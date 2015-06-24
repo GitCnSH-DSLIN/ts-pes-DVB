@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ts_psi.h>
 #include <ts_list.h>
 #include <print_debug.h>
@@ -75,22 +76,21 @@ int main(int argc, char * argv[])
     /**************************************************************************/
     TS_SDT_TABLE mtsSdtTable;
 
-    ret = find_given_table_more(pFile, tmpPacketBuffer, packetLength, PID_TS_SI_SDT, TABLE_ID_SDT_OTHER);
+    //ret = find_given_table_more(pFile, tmpPacketBuffer, packetLength, PID_TS_SI_SDT, TABLE_ID_SDT_OTHER);
+    ret = find_given_table_more(pFile, tmpPacketBuffer, packetLength, PID_TS_SI_SDT, TABLE_ID_SDT_ACTUAL);
 
     if(-1 == ret)
     {
         uprintf("Can't find the SDT table\n");
         return -1;
     }
-    uprintf("the value of ret is %d\n",ret);
-
 
     for(iCount = 0; iCount < ret; iCount++)
     {
         parse_sdt_table(tmpPacketBuffer + packetLength*iCount,packetLength, &mtsSdtTable);
     }
 
-
+    free_sdt(&mtsSdtTable);
 
     /**************************************************************************/
 #if 0

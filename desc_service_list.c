@@ -5,6 +5,8 @@
  *      Author: orion
  */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <desc_service_list.h>
 #include <print_debug.h>
 
@@ -14,10 +16,10 @@ int decode_servicelist_desc(unsigned char* byteptr, int this_section_length,
 
 	desc_servicelist->descriptor_tag = SLD_DESC_TAG(b);
 	desc_servicelist->descriptor_length = SLD_DESC_LEN(b);
-
+#if 0
 	uprintf("servicelist->descriptor_tag:0x%x\n",desc_servicelist->descriptor_tag);
 	uprintf("desc_servicelist->descriptor_length:0x%x\n",desc_servicelist->descriptor_length);
-
+#endif
 	int len = desc_servicelist->descriptor_length;
 	unsigned char* item_start = &b[2];
 	while(len > 0){
@@ -36,10 +38,10 @@ int decode_servicelist_item(unsigned char* byteptr, int this_section_length,SERI
 
 	item_servicelist->service_id = SLD_DESC_ITEM_ID(b);
 	item_servicelist->service_type = SLD_DESC_ITEM_TYPE(b);
-
+#if 0
 	uprintf("item_servicelist->service_id:0x%x\n",item_servicelist->service_id);
 	uprintf("item_servicelist->service_type:0x%x\n",item_servicelist->service_type);
-
+#endif
 	return l;
 }
 void free_servicelist_desc(SERVICE_LIST_DESC* head){

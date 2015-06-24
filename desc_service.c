@@ -5,6 +5,8 @@
  *      Author: orion
  */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <desc_service.h>
 #include <print_debug.h>
 
@@ -23,7 +25,7 @@ int decode_service_desc(unsigned char* byteptr, int this_section_length,
 	desc_service->service_name = (char*)calloc(desc_service->service_name_length + 1, sizeof(char));
 	strncpy(desc_service->service_name, (char*)&b[desc_service->service_provider_name_length + 5], desc_service->service_name_length);
 
-
+#if 0
  	uprintf("desc_service->descriptor_tag:0x%x\n",desc_service->descriptor_tag);
  	uprintf("desc_service->descriptor_length:0x%x\n",desc_service->descriptor_length);
  	uprintf("desc_service->service_type:0x%x\n",desc_service->service_type);
@@ -31,7 +33,7 @@ int decode_service_desc(unsigned char* byteptr, int this_section_length,
  	uprintf("desc_service->provider_name:%s\n",desc_service->provider_name);
  	uprintf("desc_service->service_name_length:0x%x\n",desc_service->service_name_length);
  	uprintf("desc_service->service_name:%s\n",desc_service->service_name);
-
+#endif
 	return (desc_service->descriptor_length + 2);
 
 }
