@@ -1,7 +1,21 @@
 CFLAGS    = -g  -Wall -Iinclude \
 
 SRCS = $(wildcard *.c)
+SRCS += $(wildcard ./descriptors/*.c)
 OBJS = $(patsubst %.c,%.o,$(SRCS))
+
+
+CUR_DIR = $(shell pwd)
+OBJDIR_O = $(CUR_DIR)/objdir_o
+OBJDIR_D = $(CUR_DIR)/objdir_d
+
+define MKDIR
+@echo 'making directory $(OBJDIR_D)...'
+if [ ! -d $(OBJDIR_D) ];then mkdir $(OBJDIR_D);fi
+@echo 'making directory $(OBJDIR_O)...'
+if [ ! -d $(OBJDIR_O) ];then mkdir $(OBJDIR_O);fi
+@echo ''
+endef
 
 TARGET=test
 
@@ -12,7 +26,7 @@ all: $(TARGET)
 	@echo
 
 clean:
-	rm -f $(TARGET) *.o
+	rm -f $(TARGET) *.o ./descriptors/*.o
 
 test:$(OBJS)
 	$(CC) -o $@ $^ $(CFLAGS)
