@@ -9,12 +9,8 @@
 #include <string.h>
 #include <print_debug.h>
 #include <sdt.h>
-#include <desc_short_event.h>
-#include <desc_network_name.h>
-#include <desc_service.h>
-#include <desc_service_list.h>
 #include <ts_psi.h>
-
+#include <descriptor.h>
 P_SDT_SERVICE insert_sdt_service_node(SDT_SERVICE * Header, SDT_SERVICE * node)
 {
     SDT_SERVICE * ptmp = Header;
@@ -30,131 +26,6 @@ P_SDT_SERVICE insert_sdt_service_node(SDT_SERVICE * Header, SDT_SERVICE * node)
 
     return Header;
 }
-
-
-void* decode_desc(unsigned char* byteptr, int this_section_length)
-{
-	unsigned char* b = byteptr;
-	int desc_len;
-	int l = this_section_length;
-
-	void* this_descriptor = NULL;
-
-	switch (b[0]) 
-    {
-		//maybe NETWORK_NAME_DESC will be globle var
-	    case 0x40: // network_name_descriptor
-	    {
-		    this_descriptor = (void*)malloc(sizeof(NETWORK_NAME_DESC));
-		    memset(this_descriptor, 0, sizeof(NETWORK_NAME_DESC));
-		    //NETWORK_NAME_DESC desc_network_name;
-		    desc_len = decode_network_name_desc(b, this_section_length,
-				    this_descriptor);
-		    b += desc_len;
-		    l -= desc_len;
-
-		    if(b < b + l)
-            {
-			    ((NETWORK_NAME_DESC*)this_descriptor)->next_desc = decode_desc(b, l);
-		    }
-	    }
-		break;
-	    
-        case 0x41: 
-        {
-		    this_descriptor = (void*)malloc(sizeof(SERVICE_LIST_DESC));
-		    memset(this_descriptor, 0, sizeof(SERVICE_LIST_DESC));
-		    desc_len = decode_servicelist_desc(b, this_section_length,
-				    this_descriptor);
-		    b += desc_len;
-		    l -= desc_len;
-
-		    if(b < b + l)
-            {
-			    ((SERVICE_LIST_DESC*)this_descriptor)->next_desc = decode_desc(b, l);
-		    }
-	    }
-		break;
-
-	    case 0x48: 
-        {
-		    this_descriptor = (void*)malloc(sizeof(SERVICE_DESC));
-		    memset(this_descriptor, 0, sizeof(SERVICE_DESC));
-		    desc_len = decode_service_desc(b, this_section_length,
-				    this_descriptor);
-		    b += desc_len;
-		    l -= desc_len;
-
-		    if(b < b + l){
-			    ((SERVICE_DESC*)this_descriptor)->next_desc = decode_desc(b, l);
-		    }
-	    }
-		break;
-	
-        case 0x4d: 
-        {
-		    this_descriptor = (void*)malloc(sizeof(SHORT_EVENT_DESC));
-		    memset(this_descriptor, 0 ,sizeof(SHORT_EVENT_DESC));
-		    desc_len = decode_short_evt_desc(b, this_section_length,
-				    this_descriptor);
-		    b += desc_len;
-		    l -= desc_len;
-
-		    if(b < b + l)
-            {
-			    ((SHORT_EVENT_DESC*)this_descriptor)->next_desc = decode_desc(b, l);
-		    }
-	    }
-		break;
-
-	    default:
-        {
-		    // other descriptors we don't handle them,but we need their length,so we get it.
-		    desc_len = b[1] + 2 ;
-		    b += desc_len;
-		    l -= desc_len;
-
-		    if(b < b + l)
-            {
-			    this_descriptor = decode_desc(b, l);
-		    }
-	    }
-    }
-
-	return this_descriptor;
-}
-
-
-void free_desc(void* phead)
-{
-	//void* this_descriptor = phead;
-	unsigned char* b = (unsigned char *)phead;
-
-	if(b == NULL){
-		return;
-	}
-
-    switch(b[0]){
-	case 0x40:  // NETWORK_NAME_DESC
-		free_network_name_desc((NETWORK_NAME_DESC*)phead);
-		break;
-	case 0x41: //SERVICE_LIST_DESC
-		free_servicelist_desc((SERVICE_LIST_DESC*)phead);
-		break;
-	case 0x48: //SERVICE_DESC
-		free_service_desc((SERVICE_DESC*)phead);
-		break;
-	case 0x4d: //SHORT_EVENT_DESC
-		free_short_evt_desc((SHORT_EVENT_DESC*)phead);
-		break;
-	default:
-		//free_desc();
-		return;
-	}
-}
-
-
-
 
 
 int decode_sdt_service(unsigned char * byteptr, int this_section_length, SDT_SERVICE* psdtService)
@@ -241,21 +112,22 @@ int parse_sdt_table(unsigned char * byteptr, int this_section_length, TS_SDT_TAB
     return 0;
 }
 
-#if 0
+
 void show_sdt_service_descriptors_info(SDT_SERVICE * sdtService)
 {
-	void * HeaderDesc = sdtService->first_desc;
-    void * ptmp = HeaderDesc;
+	SDT_DESCRIPTOR_COMMON *HeaderDesc = (SDT_DESCRIPTOR_COMMON *)sdtService->first_desc;
+    SDT_DESCRIPTOR_COMMON *ptmp = HeaderDesc;
+    unsigned char descriptor_tag;
+    unsigned char descriptor_length;
 
     while (NULL != ptmp)
     {
-        uprintf("\t\tSDT_Service_Desc->descriptor_tag       :   0x%x\n",ptmp->descriptor_tag);
-	    uprintf("\t\tSDT_Service_Desc->descriptor_length    :   0x%x\n",ptmp->descriptor_length);
-        ptmp = ptmp->next_desc;
+        descriptor_tag = ptmp->descriptor_tag;
+        descriptor_length = ptmp->descriptor_length;
+        (*do_show_descriptors_info[descriptor_tag - 0x40])(ptmp);
+        ptmp = (SDT_DESCRIPTOR_COMMON *)ptmp->next_desc;
     }
 }
-#endif
-
 
 void show_sdt_service_info(SDT_SERVICE * Header)
 {
@@ -267,6 +139,8 @@ void show_sdt_service_info(SDT_SERVICE * Header)
 	    uprintf("\tSDT_Service->EIT_present_following_flag   :   0x%x\n",ptmp->EIT_present_following_flag);
 	    uprintf("\tSDT_Service->running_status               :   0x%x\n",ptmp->running_status);
 	    uprintf("\tSDT_Service->descriptors_loop_length      :   0x%x\n\n",ptmp->descriptors_loop_length);
+        
+        show_sdt_service_descriptors_info(ptmp);
         ptmp = ptmp->next_sdt_service;
     }
 }

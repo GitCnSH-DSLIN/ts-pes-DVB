@@ -26,8 +26,8 @@ int main(int argc, char * argv[])
     unsigned char * tmpPacketBuffer = (unsigned char *)malloc(BUFFER_SIZE);
     memset(tmpPacketBuffer,'\0', BUFFER_SIZE);
 
-    //if((pFile = fopen("ocn_203.ts","rb")) == NULL)
-    if((pFile = fopen("EMMStressSoakTest_V3.11.9.mpg","rb")) == NULL)
+    if((pFile = fopen("ocn_203.ts","rb")) == NULL)
+    //if((pFile = fopen("EMMStressSoakTest_V3.11.9.mpg","rb")) == NULL)
     {
         uprintf("Open file failed\n");
         return -1;
@@ -76,7 +76,6 @@ int main(int argc, char * argv[])
 
 #endif
     /**************************************************************************/
-# if 0
     TS_SDT_TABLE mtsSdtTable;
 
     //ret = find_given_table_more(pFile, tmpPacketBuffer, packetLength, PID_TS_SI_SDT, TABLE_ID_SDT_OTHER);
@@ -94,7 +93,7 @@ int main(int argc, char * argv[])
     }
 
     free_sdt(&mtsSdtTable);
-#endif
+
     /**************************************************************************/
 #if 0
     printf("\nInput the elementary_PID to store :");
@@ -111,6 +110,7 @@ int main(int argc, char * argv[])
     //fclose(pSaveFile);
 #endif
     /**************************************************************************/
+#ifdef DEFINE CA_PID_EMM
     unsigned int caPid = 0x500;
     unsigned int ts_packet_length = TS_PACKET_LENGTH;
     CA_PID_EMM * pcaPidEmmHeader = (P_CA_PID_EMM)malloc(sizeof(CA_PID_EMM));
@@ -119,6 +119,7 @@ int main(int argc, char * argv[])
     
     show_ca_pid_emm_list_info(pcaPidEmmHeader);
     free_ca_pid_emm_list(pcaPidEmmHeader);
+#endif
     /**************************************************************************/
 
 	fclose(pFile);

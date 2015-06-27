@@ -10,11 +10,14 @@
 #include <desc_short_event.h>
 #include <print_debug.h>
 
-int decode_short_evt_desc(unsigned char* byteptr, int this_section_length,
-        SHORT_EVENT_DESC* desc_short_event){
+SDT_DESCRIPTOR_COMMON * decode_short_event_desc(unsigned char* byteptr, int this_section_length)
+{
 	unsigned char* b = byteptr;
 
-	desc_short_event->descriptor_tag = SHORT_EVT_DESC_TAG(b);
+    SHORT_EVENT_DESC * desc_short_event = (SHORT_EVENT_DESC *)malloc(sizeof(SHORT_EVENT_DESC));
+	memset(desc_short_event, 0, sizeof(SHORT_EVENT_DESC));
+	
+    desc_short_event->descriptor_tag = SHORT_EVT_DESC_TAG(b);
 	desc_short_event->descriptor_length = SHORT_EVT_DESC_LENGTH(b);
 	desc_short_event->ISO_639_language_code = SHORT_EVT_DESC_LANG(b);
 	desc_short_event->event_name_length = SHORT_EVT_DESC_NAME_LENGTH(b);
@@ -32,7 +35,7 @@ int decode_short_evt_desc(unsigned char* byteptr, int this_section_length,
 	uprintf("desc_short_event->text_length:0x%x\n",desc_short_event->text_length);
 	uprintf("desc_short_event->text:%s\n",desc_short_event->text);
 #endif
-	return (desc_short_event->descriptor_length + 2);
+	return (SDT_DESCRIPTOR_COMMON *)desc_short_event;
 }
 
 void free_short_evt_desc(SHORT_EVENT_DESC* head){
@@ -44,4 +47,12 @@ void free_short_evt_desc(SHORT_EVENT_DESC* head){
 	head->next_desc = NULL;
 	free(head);
 	head = NULL;
+}
+
+void show_short_event_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
+{
+    SHORT_EVENT_DESC * tmp = (SHORT_EVENT_DESC*)ptmp;
+	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);
+	uprintf("\t\tdescriptor_name    :   network_name_descriptor\n");
+	uprintf("\t\tdescriptor_length  :   0x%x\n",tmp->descriptor_length);
 }

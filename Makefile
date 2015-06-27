@@ -1,8 +1,9 @@
-CFLAGS    = -g  -Wall -Iinclude \
+CFLAGS    = -g  -Wall -Iinclude -Idescriptors/include \
 
 SRCS = $(wildcard *.c)
-SRCS += $(wildcard ./descriptors/*.c)
+SRCS += $(wildcard ./descriptors/*.c ./test_program/*.c)
 OBJS = $(patsubst %.c,%.o,$(SRCS))
+TARGET = $(wildcard ./test_program/*.c)
 
 
 CUR_DIR = $(shell pwd)

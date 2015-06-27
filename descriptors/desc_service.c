@@ -11,11 +11,14 @@
 #include <print_debug.h>
 
 
-int decode_service_desc(unsigned char* byteptr, int this_section_length,
-        SERVICE_DESC* desc_service){
+SDT_DESCRIPTOR_COMMON * decode_service_desc(unsigned char* byteptr, int this_section_length)
+{
 	unsigned char* b = byteptr;
 
-	desc_service->descriptor_tag = SERV_DESC_TAG(b);
+	SERVICE_DESC * desc_service = (SERVICE_DESC*)malloc(sizeof(SERVICE_DESC));
+	memset(desc_service, 0, sizeof(SERVICE_DESC));
+	
+    desc_service->descriptor_tag = SERV_DESC_TAG(b);
 	desc_service->descriptor_length = SERV_DESC_LENGTH(b);
 	desc_service->service_type = SERV_DESC_SERV_TYPE(b);
 	desc_service->service_provider_name_length = SERV_DESC_SERV_PRO_NAME_LENGTH(b);
@@ -34,8 +37,7 @@ int decode_service_desc(unsigned char* byteptr, int this_section_length,
  	uprintf("desc_service->service_name_length:0x%x\n",desc_service->service_name_length);
  	uprintf("desc_service->service_name:%s\n",desc_service->service_name);
 #endif
-	return (desc_service->descriptor_length + 2);
-
+	return (SDT_DESCRIPTOR_COMMON *)desc_service;
 }
 void free_service_desc(SERVICE_DESC* head){
 	free(head->provider_name);
@@ -48,3 +50,15 @@ void free_service_desc(SERVICE_DESC* head){
 	head = NULL;
 }
 
+void show_service_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
+{
+    SERVICE_DESC * tmp = (SERVICE_DESC*)ptmp;
+	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);
+	uprintf("\t\tdescriptor_name    :   service_descriptor\n");
+	uprintf("\t\tdescriptor_length  :   0x%x\n",tmp->descriptor_length);
+ 	uprintf("\t\tservice_type       :   0x%x\n",tmp->service_type);
+ 	uprintf("\t\tservice_provider_name_length   :   0x%x\n",tmp->service_provider_name_length);
+ 	uprintf("\t\tprovider_name      :   %s\n",tmp->provider_name);
+ 	uprintf("\t\tservice_name_length:   0x%x\n",tmp->service_name_length);
+ 	uprintf("\t\tservice_name       :   %s\n\n",tmp->service_name);
+}

@@ -34,3 +34,10 @@ void free_CA_identifier_desc(CA_IDENTIFIER_DESC * pCaIdentifierDesc)
     pCaIdentifierDesc = NULL;
 }
 
+void show_CA_identifier_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
+{
+    CA_IDENTIFIER_DESC * tmp = (CA_IDENTIFIER_DESC *)ptmp;
+	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);
+	uprintf("\t\tdescriptor_name    :   CA_identifier_descriptor\n");
+	uprintf("\t\tdescriptor_length  :   0x%x\n",tmp->descriptor_length);
+}

@@ -10,11 +10,14 @@
 #include <desc_service_list.h>
 #include <print_debug.h>
 
-int decode_servicelist_desc(unsigned char* byteptr, int this_section_length,
-        SERVICE_LIST_DESC* desc_servicelist){
+SDT_DESCRIPTOR_COMMON * decode_service_list_desc(unsigned char* byteptr, int this_section_length)
+{
 	unsigned char* b = byteptr;
 
-	desc_servicelist->descriptor_tag = SLD_DESC_TAG(b);
+	SERVICE_LIST_DESC * desc_servicelist = (SERVICE_LIST_DESC *)malloc(sizeof(SERVICE_LIST_DESC));
+	memset(desc_servicelist, 0, sizeof(SERVICE_LIST_DESC));
+	
+    desc_servicelist->descriptor_tag = SLD_DESC_TAG(b);
 	desc_servicelist->descriptor_length = SLD_DESC_LEN(b);
 #if 0
 	uprintf("servicelist->descriptor_tag:0x%x\n",desc_servicelist->descriptor_tag);
@@ -29,7 +32,7 @@ int decode_servicelist_desc(unsigned char* byteptr, int this_section_length,
 		len -= 3;
 	}
 
-	return (desc_servicelist->descriptor_length + 2);
+	return (SDT_DESCRIPTOR_COMMON *)desc_servicelist;
 }
 
 int decode_servicelist_item(unsigned char* byteptr, int this_section_length,SERIVCE_LIST_DESC_ITEM* item_servicelist){
@@ -49,4 +52,14 @@ void free_servicelist_desc(SERVICE_LIST_DESC* head){
 	head->next_desc = NULL;
 	free(head);
 	head = NULL;
+}
+
+
+
+void show_service_list_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
+{
+    SERVICE_LIST_DESC * tmp = (SERVICE_LIST_DESC*)ptmp;
+	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);
+	uprintf("\t\tdescriptor_name    :   service_list_descriptor\n");
+	uprintf("\t\tdescriptor_length  :   0x%x\n",tmp->descriptor_length);
 }

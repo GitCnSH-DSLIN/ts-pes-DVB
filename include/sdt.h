@@ -17,6 +17,16 @@
 #define PID_TS_SI_SDT   (0x0011)
 #define TABLE_ID_SDT_ACTUAL     (0x42)
 #define TABLE_ID_SDT_OTHER     (0x46)
+
+typedef struct sdt_descriptor_common{
+    unsigned char descriptor_tag;
+    unsigned char descriptor_length;
+    struct sdt_descriptor_common * next_desc;
+}SDT_DESCRIPTOR_COMMON, *P_SDT_DESCRIPTOR_COMMON;
+
+
+
+
 //SDT service
 typedef struct sdt_service {
 	unsigned service_id : 16;
@@ -27,7 +37,7 @@ typedef struct sdt_service {
 	unsigned free_CA_mode : 1;
 	unsigned descriptors_loop_length : 12;
 	
-    void* first_desc; //point to descriptor list.
+    SDT_DESCRIPTOR_COMMON * first_desc; //point to descriptor list.
 
 	struct sdt_service* next_sdt_service;
 }SDT_SERVICE, *P_SDT_SERVICE;
@@ -106,7 +116,7 @@ typedef struct ts_sdt_table {
 
 int parse_sdt_table(unsigned char* byteptr, int this_section_length, TS_SDT_TABLE * sdt);
 int decode_sdt_service(unsigned char* byteptr, int this_section_length, SDT_SERVICE * sdt_service);
-void* decode_desc(unsigned char* byteptr, int this_section_length);
+SDT_DESCRIPTOR_COMMON * decode_desc(unsigned char* byteptr, int this_section_length);
 void free_desc(void* phead);
 void free_sdt_service(TS_SDT_TABLE * sdtService);
 void free_sdt(TS_SDT_TABLE * sdtTable);

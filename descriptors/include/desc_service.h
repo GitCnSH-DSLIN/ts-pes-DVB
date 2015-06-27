@@ -8,15 +8,17 @@
 #ifndef _DESC_SERVICE_H_
 #define _DESC_SERVICE_H_
 
+#include <sdt.h>
+
 typedef struct service_desc{
 	unsigned char descriptor_tag;
 	unsigned char descriptor_length;
+	void* next_desc;
 	unsigned char service_type;
 	unsigned char service_provider_name_length;
 	char* provider_name;
 	unsigned char service_name_length;
 	char* service_name;
-	void* next_desc;
 }SERVICE_DESC,* P_SERVICE_DESC;
 
 #define SERV_DESC_TAG(b)					(b[0])
@@ -29,8 +31,10 @@ typedef struct service_desc{
 											b[base]; \
 											})
 
-int decode_service_desc(unsigned char* byteptr, int this_section_length,
-        SERVICE_DESC * desc_service);
+SDT_DESCRIPTOR_COMMON * decode_service_desc(unsigned char* byteptr, int this_section_length);
+
 void free_service_desc(SERVICE_DESC * head);
+
+void show_service_descriptor(SDT_DESCRIPTOR_COMMON *ptmp);
 
 #endif /* _DESC_SERVICE_H_ */

@@ -8,15 +8,17 @@
 #ifndef _DESC_SHORT_EVENT_H_
 #define _DESC_SHORT_EVENT_H_
 
+#include <sdt.h>
+
 typedef struct short_event_desc{
 	unsigned char descriptor_tag;
 	unsigned char descriptor_length;
+	void* next_desc;
 	unsigned int ISO_639_language_code;
 	unsigned char event_name_length;
 	char* event_name;
 	unsigned char text_length;
 	char* text;
-	void* next_desc;
 }SHORT_EVENT_DESC,*P_SHORT_EVENT_DESC;
 
 
@@ -30,8 +32,9 @@ typedef struct short_event_desc{
 											b[base]; \
 										})
 
-int decode_short_evt_desc(unsigned char* byteptr, int this_section_length,
-        SHORT_EVENT_DESC* desc_short_event);
+SDT_DESCRIPTOR_COMMON * decode_short_event_desc(unsigned char* byteptr, int this_section_length);
 void free_short_evt_desc(SHORT_EVENT_DESC* head);
+
+void show_short_event_descriptor(SDT_DESCRIPTOR_COMMON *ptmp);
 
 #endif /* _DESC_SHORT_EVENT_H_ */

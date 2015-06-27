@@ -7,6 +7,7 @@
 
 #ifndef _DESC_SERVICE_LIST_H_
 #define _DESC_SERVICE_LIST_H_
+#include <sdt.h>
 
 typedef struct service_list_desc_item{
 	unsigned short service_id;
@@ -27,10 +28,12 @@ typedef struct service_list_desc{
 #define SLD_DESC_ITEM_ID(b)			((b[0] << 8) | b[1])
 #define SLD_DESC_ITEM_TYPE(b)		(b[2])
 
-int decode_servicelist_desc(unsigned char* byteptr, int this_section_length,
-        SERVICE_LIST_DESC* desc_servicelist);
+SDT_DESCRIPTOR_COMMON * decode_service_list_desc(unsigned char* byteptr, int this_section_length);
+
 int decode_servicelist_item(unsigned char* byteptr, int this_section_length,
         SERIVCE_LIST_DESC_ITEM* item_servicelist);
+
+void show_service_list_descriptor(SDT_DESCRIPTOR_COMMON *ptmp);
 
 void free_servicelist_desc(SERVICE_LIST_DESC* head);
 #endif /* _DESC_SERVICE_LIST_H_ */
