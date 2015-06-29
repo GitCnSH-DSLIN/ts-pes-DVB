@@ -1,9 +1,10 @@
-/*
- * desc_service_list.c
- *
- *  Created on: Jun 24, 2011
- *      Author: orion
- */
+/*********************************************************************
+*
+* Filename      :   desc_service_list.c
+* Description   :   
+* edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
+*
+*********************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -47,10 +48,16 @@ int decode_servicelist_item(unsigned char* byteptr, int this_section_length,SERI
 #endif
 	return l;
 }
-void free_servicelist_desc(SERVICE_LIST_DESC* head){
-	free_desc(head->next_desc);
-	head->next_desc = NULL;
-	free(head);
+
+void free_service_list_desc(SDT_DESCRIPTOR_COMMON *head)
+{
+	SERVICE_LIST_DESC *phead = (SERVICE_LIST_DESC *)head;
+        
+    free_desc(phead->next_desc);
+	phead->next_desc = NULL;
+	
+    free(phead);
+    phead = NULL;
 	head = NULL;
 }
 

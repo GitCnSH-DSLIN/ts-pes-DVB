@@ -1,9 +1,10 @@
-/*
- * desc_service.h
- *
- *  Created on: Jun 24, 2011
- *      Author: orion
- */
+/*********************************************************************
+*
+* Filename      :   desc_service.h
+* Description   :   
+* edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
+*
+*********************************************************************/
 
 #ifndef _DESC_SERVICE_H_
 #define _DESC_SERVICE_H_
@@ -33,7 +34,7 @@ typedef struct service_desc{
 
 SDT_DESCRIPTOR_COMMON * decode_service_desc(unsigned char* byteptr, int this_section_length);
 
-void free_service_desc(SERVICE_DESC * head);
+void free_service_desc(SDT_DESCRIPTOR_COMMON * head);
 
 void show_service_descriptor(SDT_DESCRIPTOR_COMMON *ptmp);
 

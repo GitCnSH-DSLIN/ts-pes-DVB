@@ -1,10 +1,10 @@
-/*
- * desc_short_event.h
- *
- *  Created on: Jun 24, 2011
- *      Author: orion
- */
-
+/*********************************************************************
+*
+* Filename      :   desc_short_event.h
+* Description   :   
+* edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
+*
+*********************************************************************/
 #ifndef _DESC_SHORT_EVENT_H_
 #define _DESC_SHORT_EVENT_H_
 
@@ -33,7 +33,7 @@ typedef struct short_event_desc{
 										})
 
 SDT_DESCRIPTOR_COMMON * decode_short_event_desc(unsigned char* byteptr, int this_section_length);
-void free_short_evt_desc(SHORT_EVENT_DESC* head);
+void free_short_event_desc(SDT_DESCRIPTOR_COMMON* head);
 
 void show_short_event_descriptor(SDT_DESCRIPTOR_COMMON *ptmp);
 

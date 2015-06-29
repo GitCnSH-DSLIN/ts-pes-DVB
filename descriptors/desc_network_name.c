@@ -1,9 +1,10 @@
-/*
- * desc_network_name.c
- *
- *  Created on: Jun 24, 2011
- *      Author: orion
- */
+/*********************************************************************
+*
+* Filename      :   desc_network_name.c
+* Description   :   
+* edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
+*
+*********************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,13 +27,18 @@ SDT_DESCRIPTOR_COMMON * decode_network_name_desc(unsigned char * byteptr, int th
     return (SDT_DESCRIPTOR_COMMON *)desc_network_name; 
 }
 
-void free_network_name_desc(NETWORK_NAME_DESC* head){
-	free(head->network_name);
-	head->network_name = NULL;
-	free_desc(head->next_desc);
-	head->next_desc = NULL;
-	free(head);
-	head = NULL;
+void free_network_name_desc(SDT_DESCRIPTOR_COMMON* head)
+{
+	NETWORK_NAME_DESC * phead = (NETWORK_NAME_DESC *)head;
+    free(phead->network_name);
+	phead->network_name = NULL;
+	
+    free_desc(phead->next_desc);
+    phead->next_desc = NULL;
+	
+    free(phead);
+	phead = NULL;
+    head  = NULL;
 }
 
 void show_network_name_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
@@ -42,6 +48,7 @@ void show_network_name_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
 	uprintf("\t\tdescriptor_name    :   network_name_descriptor\n");
 	uprintf("\t\tdescriptor_length  :   0x%x\n",tmp->descriptor_length);
 	uprintf("\t\tnetwork_name       :   %s\n",tmp->network_name);
+	uprintf("\t\tnext_desc          :   0x%x\n\n",(unsigned int)(tmp->next_desc));
 }
 
 

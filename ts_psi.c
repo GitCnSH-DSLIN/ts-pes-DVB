@@ -1,6 +1,6 @@
 /*********************************************************************
 *
-* Filename      :   ts_psc.h
+* Filename      :   ts_psi.c
 * Description   :   fundamental operation of psi protocol of DVB
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *

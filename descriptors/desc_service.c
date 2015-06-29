@@ -1,9 +1,10 @@
-/*
- * desc_service.c
- *
- *  Created on: Jun 24, 2011
- *      Author: orion
- */
+/*********************************************************************
+*
+* Filename      :   desc_service.c
+* Description   :   
+* edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
+*
+*********************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,14 +40,23 @@ SDT_DESCRIPTOR_COMMON * decode_service_desc(unsigned char* byteptr, int this_sec
 #endif
 	return (SDT_DESCRIPTOR_COMMON *)desc_service;
 }
-void free_service_desc(SERVICE_DESC* head){
-	free(head->provider_name);
-	free(head->service_name);
-	head->provider_name = NULL;
-	head->service_name = NULL;
-	free_desc(head->next_desc);
-	head->next_desc = NULL;
-	free(head);
+
+
+void free_service_desc(SDT_DESCRIPTOR_COMMON * head)
+{
+//    uprintf("prepare to free : 0x%x\n",head->descriptor_tag);
+	SERVICE_DESC * phead = (SERVICE_DESC *)head;
+    
+    free(phead->provider_name);
+	free(phead->service_name);
+	phead->provider_name = NULL;
+	phead->service_name = NULL;
+	
+    free_desc(phead->next_desc);
+	phead->next_desc = NULL;
+	
+    free(phead);
+    phead = NULL;
 	head = NULL;
 }
 
@@ -61,4 +71,5 @@ void show_service_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
  	uprintf("\t\tprovider_name      :   %s\n",tmp->provider_name);
  	uprintf("\t\tservice_name_length:   0x%x\n",tmp->service_name_length);
  	uprintf("\t\tservice_name       :   %s\n\n",tmp->service_name);
+	uprintf("\t\tnext_desc          :   0x%x\n\n",(unsigned int)(tmp->next_desc));
 }

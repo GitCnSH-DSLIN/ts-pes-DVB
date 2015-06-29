@@ -1,10 +1,11 @@
 /*********************************************************************
 *
-* Filename      :   si_descriptor.h
-* Description   :   given the fundamental struction of si descriptor of DVB
+* Filename      :   desc_CA_identifier.h
+* Description   :   
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/
+
 
 #ifndef  _MPEG_SI_DESCRITPOR_H_
 #define  _MPEG_SI_DESCRIPTOR_H_

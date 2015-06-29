@@ -1,16 +1,17 @@
-/*
- * sdt.c
- *
- *  Created on: Jun 21, 2011
- *      Author: orion
- */
+/*********************************************************************
+*
+* Filename      :   sdt.c
+* Description   :   fundamental operation for SDT table and SDT service.
+* edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
+*
+*********************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <print_debug.h>
 #include <sdt.h>
 #include <ts_psi.h>
-#include <descriptor.h>
+#include <sdt_descriptor.h>
 P_SDT_SERVICE insert_sdt_service_node(SDT_SERVICE * Header, SDT_SERVICE * node)
 {
     SDT_SERVICE * ptmp = Header;
@@ -113,21 +114,6 @@ int parse_sdt_table(unsigned char * byteptr, int this_section_length, TS_SDT_TAB
 }
 
 
-void show_sdt_service_descriptors_info(SDT_SERVICE * sdtService)
-{
-	SDT_DESCRIPTOR_COMMON *HeaderDesc = (SDT_DESCRIPTOR_COMMON *)sdtService->first_desc;
-    SDT_DESCRIPTOR_COMMON *ptmp = HeaderDesc;
-    unsigned char descriptor_tag;
-    unsigned char descriptor_length;
-
-    while (NULL != ptmp)
-    {
-        descriptor_tag = ptmp->descriptor_tag;
-        descriptor_length = ptmp->descriptor_length;
-        (*do_show_descriptors_info[descriptor_tag - 0x40])(ptmp);
-        ptmp = (SDT_DESCRIPTOR_COMMON *)ptmp->next_desc;
-    }
-}
 
 void show_sdt_service_info(SDT_SERVICE * Header)
 {
@@ -164,9 +150,6 @@ void show_sdt_table_info(TS_SDT_TABLE * pSdtTable)
 }
 
 
-
-
-
 void free_sdt_service(TS_SDT_TABLE * sdt)
 {
 	SDT_SERVICE *head = sdt->first_sdt_service;
@@ -186,6 +169,7 @@ void free_sdt_service(TS_SDT_TABLE * sdt)
 
 	sdt->first_sdt_service = NULL;
 }
+
 
 void free_sdt(TS_SDT_TABLE * sdt)
 {

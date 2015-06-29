@@ -1,14 +1,13 @@
 /*********************************************************************
 *
-* Filename      :   ts_si.h
-* Description   :   given the fundamental struction of si protocol of DVB
+* Filename      :   sdt.c
+* Description   :   given the fundamental struction of SDT table and SDT service.
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/
 
 #ifndef  _MPEG_TS_SI_H_
 #define  _MPEG_TS_SI_H_
-
 /*********************************************************************
  *              SDT releated struction
  *   struction : sdt table --> sdt_service --> descriptor
@@ -23,9 +22,6 @@ typedef struct sdt_descriptor_common{
     unsigned char descriptor_length;
     struct sdt_descriptor_common * next_desc;
 }SDT_DESCRIPTOR_COMMON, *P_SDT_DESCRIPTOR_COMMON;
-
-
-
 
 //SDT service
 typedef struct sdt_service {
@@ -116,8 +112,6 @@ typedef struct ts_sdt_table {
 
 int parse_sdt_table(unsigned char* byteptr, int this_section_length, TS_SDT_TABLE * sdt);
 int decode_sdt_service(unsigned char* byteptr, int this_section_length, SDT_SERVICE * sdt_service);
-SDT_DESCRIPTOR_COMMON * decode_desc(unsigned char* byteptr, int this_section_length);
-void free_desc(void* phead);
 void free_sdt_service(TS_SDT_TABLE * sdtService);
 void free_sdt(TS_SDT_TABLE * sdtTable);
 void show_sdt_table_info(TS_SDT_TABLE * pSdtTable);

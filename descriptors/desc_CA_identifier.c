@@ -1,3 +1,11 @@
+/*********************************************************************
+*
+* Filename      :   desc_CA_identifier.c
+* Description   :   
+* edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
+*
+*********************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

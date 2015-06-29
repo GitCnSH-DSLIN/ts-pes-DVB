@@ -1,9 +1,10 @@
-/*
- * desc_short_event.c
- *
- *  Created on: Jun 24, 2011
- *      Author: orion
- */
+/*********************************************************************
+*
+* Filename      :   desc_short_event.c
+* Description   :   
+* edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
+*
+*********************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,15 +39,21 @@ SDT_DESCRIPTOR_COMMON * decode_short_event_desc(unsigned char* byteptr, int this
 	return (SDT_DESCRIPTOR_COMMON *)desc_short_event;
 }
 
-void free_short_evt_desc(SHORT_EVENT_DESC* head){
-	free(head->event_name);
-	free(head->text);
-	head->event_name = NULL;
-	head->text = NULL;
-	free_desc(head->next_desc);
-	head->next_desc = NULL;
-	free(head);
-	head = NULL;
+void free_short_event_desc(SDT_DESCRIPTOR_COMMON* head)
+{
+	SHORT_EVENT_DESC * phead = (SHORT_EVENT_DESC *)head;
+    
+    free(phead->event_name);
+	free(phead->text);
+	phead->event_name = NULL;
+	phead->text = NULL;
+	
+    free_desc(phead->next_desc);
+	phead->next_desc = NULL;
+	
+    free(phead);
+	phead = NULL;
+    head = NULL;
 }
 
 void show_short_event_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
