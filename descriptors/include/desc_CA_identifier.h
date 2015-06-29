@@ -22,7 +22,8 @@ typedef struct CA_identifier_descriptor{
 int decode_CA_identifier_desc(unsigned char* byteptr, int this_section_length,
         CA_IDENTIFIER_DESC * pCaIdentifier_desc);
 
-void free_CA_identifier_desc(CA_IDENTIFIER_DESC * head);
+void free_CA_identifier_desc(SDT_DESCRIPTOR_COMMON * head);
 
+void show_CA_identifier_descriptor(SDT_DESCRIPTOR_COMMON *ptmp);
 
 #endif

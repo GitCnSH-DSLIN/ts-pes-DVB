@@ -45,7 +45,7 @@ SDT_DESCRIPTOR_COMMON * (*do_decode_desc[64])(unsigned char * byteptr, int this_
     decode_default,                                       //0x50
     decode_default,                                       //0x51
     decode_default,                                       //0x52
-    decode_default,                                       //0x53
+    decode_CA_identifier_desc,                      //0x53
     decode_default,                                       //0x54
     decode_default,                                       //0x55
     decode_default,                                       //0x56
@@ -146,24 +146,24 @@ void (*do_free_descriptors[64])(SDT_DESCRIPTOR_COMMON *ptmp) = {
     /*free descriptor for each different descriptors*/
     free_network_name_desc,               //0x40
     free_service_list_desc,               //0x41
-    free_desc_default,                                       //0x42
-    free_desc_default,                                       //0x43
-    free_desc_default,                                       //0x44
-    free_desc_default,                                       //0x45
-    free_desc_default,                                       //0x46
-    free_desc_default,                                       //0x47
+    free_desc_default,                                      //0x42
+    free_desc_default,                                      //0x43
+    free_desc_default,                                      //0x44
+    free_desc_default,                                      //0x45
+    free_desc_default,                                      //0x46
+    free_desc_default,                                      //0x47
     free_service_desc,                    //0x48
-    free_desc_default,                                       //0x49
-    free_desc_default,                                       //0x4a
-    free_desc_default,                                       //0x4b
-    free_desc_default,                                       //0x4c
+    free_desc_default,                                      //0x49
+    free_desc_default,                                      //0x4a
+    free_desc_default,                                      //0x4b
+    free_desc_default,                                      //0x4c
     free_short_event_desc,                  //0x4d
-    free_desc_default,                                       //0x4e
-    free_desc_default,                                       //0x4f
-    free_desc_default,                                       //0x50
-    free_desc_default,                                       //0x51
-    free_desc_default,                                       //0x52
-    free_desc_default,                                       //0x53
+    free_desc_default,                                      //0x4e
+    free_desc_default,                                      //0x4f
+    free_desc_default,                                      //0x50
+    free_desc_default,                                      //0x51
+    free_desc_default,                                      //0x52
+    free_CA_identifier_desc,                                //0x53
     free_desc_default,                                       //0x54
     free_desc_default,                                       //0x55
     free_desc_default,                                       //0x56
@@ -269,7 +269,7 @@ void (*do_show_descriptors_info[64])(SDT_DESCRIPTOR_COMMON *ptmp) = {
     show_desc_default,                                       //0x50
     show_desc_default,                                       //0x51
     show_desc_default,                                       //0x52
-    show_desc_default,                                       //0x53
+    show_CA_identifier_descriptor,                          //0x53
     show_desc_default,                                       //0x54
     show_desc_default,                                       //0x55
     show_desc_default,                                       //0x56

@@ -21,26 +21,30 @@ int decode_CA_identifier_desc(unsigned char* byteptr, int this_section_length,
 	caIdentifierDesc->descriptor_length = byteptr[1];
 
 	caIdentifierDesc->CA_system_id = (unsigned short*)malloc(caIdentifierDesc->descriptor_length);
-	strncpy(caIdentifierDesc->CA_system_id, (unsigned short*)&b[2], caIdentifierDesc->descriptor_length);
+    unsigned char *pCA = (unsigned char *)caIdentifierDesc->CA_system_id;
+
+	memcpy(pCA, &b[2], caIdentifierDesc->descriptor_length);
 
 	return (caIdentifierDesc->descriptor_length + 2);
 }
 
-void free_CA_identifier_desc(CA_IDENTIFIER_DESC * pCaIdentifierDesc)
+
+void free_CA_identifier_desc(SDT_DESCRIPTOR_COMMON *head)
 {
-    free(pCaIdentifierDesc->CA_system_id); 
-    pCaIdentifierDesc->CA_system_id = NULL;
+    CA_IDENTIFIER_DESC * phead = (CA_IDENTIFIER_DESC *)head;
+
+    free(phead->CA_system_id); 
+    phead->CA_system_id = NULL;
 
     //recursion itself
-    if (NULL != pCaIdentifierDesc->next_desc)
-    {
-        free_desc(pCaIdentifierDesc->next_desc);
-        pCaIdentifierDesc->next_desc = NULL;
-    }
+    free_desc(phead->next_desc);
+    phead->next_desc = NULL;
 
-    free(pCaIdentifierDesc);
-    pCaIdentifierDesc = NULL;
+    free(phead);
+    phead = NULL;
+    head  = NULL;
 }
+
 
 void show_CA_identifier_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
 {
@@ -48,4 +52,17 @@ void show_CA_identifier_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
 	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);
 	uprintf("\t\tdescriptor_name    :   CA_identifier_descriptor\n");
 	uprintf("\t\tdescriptor_length  :   0x%x\n",tmp->descriptor_length);
+
+    int index = 0;
+    int length = (tmp->descriptor_length + 1)/2;
+
+    unsigned short * p_index = tmp->CA_system_id;
+
+    for(; index < length; index++)
+    {
+        uprintf("%04X ",p_index[index]);
+        if((index + 1)%16 == 0)
+            uprintf("\n");
+    }
+    uprintf("\n");
 }
