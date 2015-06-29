@@ -14,7 +14,7 @@
 typedef struct service_desc{
 	unsigned char descriptor_tag;
 	unsigned char descriptor_length;
-	void* next_desc;
+	struct sdt_descriptor_common * next_desc;//add by myself
 	unsigned char service_type;
 	unsigned char service_provider_name_length;
 	char* provider_name;

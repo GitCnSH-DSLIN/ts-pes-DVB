@@ -12,20 +12,22 @@
 #include <print_debug.h>
 #include <desc_CA_identifier.h>
 
-int decode_CA_identifier_desc(unsigned char* byteptr, int this_section_length,
-        CA_IDENTIFIER_DESC * caIdentifierDesc)
+SDT_DESCRIPTOR_COMMON * decode_CA_identifier_desc(unsigned char* byteptr, int this_section_length)
 {
 	unsigned char* b = byteptr;
+	
+    CA_IDENTIFIER_DESC *caIdentifierDesc = (CA_IDENTIFIER_DESC *)malloc(sizeof(CA_IDENTIFIER_DESC));
+	memset(caIdentifierDesc, 0, sizeof(CA_IDENTIFIER_DESC));
 
 	caIdentifierDesc->descriptor_tag = byteptr[0];
 	caIdentifierDesc->descriptor_length = byteptr[1];
 
-	caIdentifierDesc->CA_system_id = (unsigned short*)malloc(caIdentifierDesc->descriptor_length);
+	caIdentifierDesc->CA_system_id = (unsigned short*)calloc((caIdentifierDesc->descriptor_length + 2)/2, sizeof(unsigned short));
     unsigned char *pCA = (unsigned char *)caIdentifierDesc->CA_system_id;
 
 	memcpy(pCA, &b[2], caIdentifierDesc->descriptor_length);
 
-	return (caIdentifierDesc->descriptor_length + 2);
+	return  (SDT_DESCRIPTOR_COMMON *)caIdentifierDesc;
 }
 
 

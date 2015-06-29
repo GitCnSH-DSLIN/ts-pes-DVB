@@ -11,4 +11,5 @@
 #include <desc_service.h>
 #include <desc_service_list.h>
 #include <desc_CA_identifier.h>
+#include <desc_component.h>
 

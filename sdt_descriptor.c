@@ -42,7 +42,7 @@ SDT_DESCRIPTOR_COMMON * (*do_decode_desc[64])(unsigned char * byteptr, int this_
     decode_short_event_desc,                        //0x4d
     decode_default,                                       //0x4e
     decode_default,                                       //0x4f
-    decode_default,                                       //0x50
+    decode_component_desc,                          //0x50
     decode_default,                                       //0x51
     decode_default,                                       //0x52
     decode_CA_identifier_desc,                      //0x53
@@ -160,7 +160,7 @@ void (*do_free_descriptors[64])(SDT_DESCRIPTOR_COMMON *ptmp) = {
     free_short_event_desc,                  //0x4d
     free_desc_default,                                      //0x4e
     free_desc_default,                                      //0x4f
-    free_desc_default,                                      //0x50
+    free_component_desc,                                    //0x50
     free_desc_default,                                      //0x51
     free_desc_default,                                      //0x52
     free_CA_identifier_desc,                                //0x53
@@ -266,7 +266,7 @@ void (*do_show_descriptors_info[64])(SDT_DESCRIPTOR_COMMON *ptmp) = {
     show_short_event_descriptor,                //0x4d
     show_desc_default,                                       //0x4e
     show_desc_default,                                       //0x4f
-    show_desc_default,                                       //0x50
+    show_component_descriptor,                  //0x50
     show_desc_default,                                       //0x51
     show_desc_default,                                       //0x52
     show_CA_identifier_descriptor,                          //0x53
