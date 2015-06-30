@@ -71,5 +71,4 @@ void show_service_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
  	uprintf("\t\tprovider_name      :   %s\n",tmp->provider_name);
  	uprintf("\t\tservice_name_length:   0x%x\n",tmp->service_name_length);
  	uprintf("\t\tservice_name       :   %s\n\n",tmp->service_name);
-	uprintf("\t\tnext_desc          :   0x%x\n\n",(unsigned int)(tmp->next_desc));
 }

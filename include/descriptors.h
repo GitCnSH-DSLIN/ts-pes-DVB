@@ -13,3 +13,4 @@
 #include <desc_CA_identifier.h>
 #include <desc_component.h>
 #include <desc_cable_delivery_system.h>
+#include <desc_local_time_offset.h>

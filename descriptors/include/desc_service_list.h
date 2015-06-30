@@ -1,6 +1,6 @@
 /*********************************************************************
 *
-* Filename      :   desc_service_list.c
+* Filename      :   desc_service_list.h
 * Description   :   
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
