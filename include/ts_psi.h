@@ -22,6 +22,12 @@
 
 #define PACKET_START_CODE_PREFIX        (0x000001)
 
+
+
+#define PSI_SI_PACKET_FLAG  (0)
+#define PES_PACKET_FLAG     (1)
+
+
 //adaption_field_control, 11，标识既有adaptation_field又有payload
 typedef struct ts_package_header
 {

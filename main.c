@@ -35,7 +35,7 @@ int main(int argc, char * argv[])
     init_ts_psi_list();    
 
     /*************************************************************************/
-#if 0
+//#if 0
     ret = find_given_table(pFile, tmpPacketBuffer, packetLength, PID_TS_PAT);
     if(-1 == ret)
     {
@@ -49,9 +49,9 @@ int main(int argc, char * argv[])
     }
     
     setup_pmt_stream_list(pFile, packetLength);
-#endif
+//#endif
     /**************************************************************************/
-#if 0
+//#if 0
     printf("\nInput your service id(program_number): ");
     if(1 != scanf("%d",&searchProgramId))
     {
@@ -74,7 +74,7 @@ int main(int argc, char * argv[])
         parse_pmt_table(tmpPacketBuffer + packetLength*iCount, searchProgramId, &mtsPmtTable);
     }
 
-#endif
+//#endif
     /**************************************************************************/
     TS_SDT_TABLE mtsSdtTable;
 

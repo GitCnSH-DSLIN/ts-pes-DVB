@@ -71,7 +71,6 @@ unsigned int locate_offset(TS_PACKET_HEADER *packet_head, unsigned char *buffer,
         unsigned int psiFlag, unsigned int * pes_start)
 {
     unsigned int offset_length = 0;
-    *pes_start = 0;
 
     if (0 == psiFlag)
     {
@@ -108,13 +107,13 @@ unsigned int locate_offset(TS_PACKET_HEADER *packet_head, unsigned char *buffer,
     }
     else //this is pes packet
     {
+        *pes_start = 0;
         //Have data
 
         if ((0x03 == packet_head->adaptation_field_control) || (0x01 == packet_head->adaptation_field_control))
         {
             if( 1 == packet_head->payload_unit_start_indicator )
             {
-//                uprintf("This is a PES packet start.\n");
                 *pes_start = 1;
             }
 
@@ -152,14 +151,13 @@ int parse_pat_table(unsigned char * pBuffer,TS_PAT_TABLE * psiPAT)
     unsigned short program_num;
     int ret=0, n = 0;
     P_TS_PAT_Program tmp = NULL;
-    unsigned int pes_start;
     
     TS_PACKET_HEADER tsPacketHeader;
     P_TS_PACKET_HEADER ptsPacketHeader = &tsPacketHeader;
 
     parse_ts_packet_header(ptsPacketHeader, pBuffer);
 
-    unsigned int offset = locate_offset(ptsPacketHeader, pBuffer, 0, &pes_start);
+    unsigned int offset = locate_offset(ptsPacketHeader, pBuffer, PSI_SI_PACKET_FLAG, 0);
     unsigned char * buffer = pBuffer + offset;
 
 
@@ -254,7 +252,7 @@ int parse_pmt_table (unsigned char * pBuffer,unsigned int programNumber,
     P_TS_PACKET_HEADER ptsPacketHeader = &tsPacketHeader;
     parse_ts_packet_header(ptsPacketHeader, pBuffer);
 
-    unsigned int offset = locate_offset(ptsPacketHeader,pBuffer, 0, &pes_start);
+    unsigned int offset = locate_offset(ptsPacketHeader,pBuffer, PSI_SI_PACKET_FLAG, 0);
     unsigned char * buffer = pBuffer + offset;
     struct list_head *pos;
 
@@ -437,7 +435,7 @@ int find_given_table(FILE *pFile, unsigned char *storeBuffer,
 
         if (mUserPid == ptsPacketHeader->pid)
         {
-            offsetLength = locate_offset(ptsPacketHeader, tmpbuffer, 1, &pes_start);
+            offsetLength = locate_offset(ptsPacketHeader, tmpbuffer, 0, 0);
             sectionNumber = tmpbuffer[offsetLength + 7];
             lastSectionNumber = tmpbuffer[offsetLength + 8];
             
@@ -501,10 +499,10 @@ int find_given_table_more(FILE *pFile, unsigned char *storeBuffer,
     {
         parse_ts_packet_header(ptsPacketHeader, tmpbuffer);
 
-        offsetLength = locate_offset(ptsPacketHeader, tmpbuffer, 1, &pes_start);
+        offsetLength = locate_offset(ptsPacketHeader, tmpbuffer, PSI_SI_PACKET_FLAG, 0);
         
         //distinguish the SDT BAT ST
-        if (mUserPid == ptsPacketHeader->pid && tableId == tmpbuffer[offsetLength + 1])
+        if (mUserPid == ptsPacketHeader->pid && tableId == tmpbuffer[offsetLength])
         {
 
             unsigned int copy_loop_total = 0;
@@ -514,7 +512,7 @@ int find_given_table_more(FILE *pFile, unsigned char *storeBuffer,
             ret = 1;
 
             continuity_counter = ptsPacketHeader->continuity_counter;
-            section_length = ((tmpbuffer[offsetLength + 2] & 0x0f)<<8) | (tmpbuffer[offsetLength + 3]);
+            section_length = ((tmpbuffer[offsetLength + 1] & 0x0f)<<8) | (tmpbuffer[offsetLength + 2]);
             //3 meaning before section_length bytes.    
             copy_loop_total = (section_length + 3 + offsetLength) / mPacketLength;
 
@@ -535,7 +533,7 @@ int find_given_table_more(FILE *pFile, unsigned char *storeBuffer,
                         if(fread(tmpbuffer, mPacketLength, 1, pFile) !=1 )
                             fseek(pFile, 0, SEEK_SET);
                         parse_ts_packet_header(ptsPacketHeader, tmpbuffer);
-                        offsetLength = locate_offset(ptsPacketHeader, tmpbuffer, 1, &pes_start);
+                        offsetLength = locate_offset(ptsPacketHeader, tmpbuffer, PSI_SI_PACKET_FLAG, 0);
 
                         if(mUserPid == ptsPacketHeader->pid && ptsPacketHeader->continuity_counter == continuity_counter + copy_count) 
                         {
@@ -639,7 +637,7 @@ int store_pes_stream(FILE *pFile, FILE *storeFile,
         //               1 == ptsPacketHeader->payload_unit_start_indicator)
         if (mElementaryPid == ptsPacketHeader->pid)
         {
-            offsetLength = locate_offset(ptsPacketHeader, tmpBuffer, 1, &pes_start);
+            offsetLength = locate_offset(ptsPacketHeader, tmpBuffer, PES_PACKET_FLAG, &pes_start);
 #ifdef DEBUG_DETAIL
             uprintf("the offsetLength is %d\n",offsetLength);
             show_ts_packet_header(ptsPacketHeader);
