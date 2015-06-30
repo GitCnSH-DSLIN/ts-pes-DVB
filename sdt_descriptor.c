@@ -30,7 +30,7 @@ SDT_DESCRIPTOR_COMMON * (*do_decode_desc[64])(unsigned char * byteptr, int this_
     decode_service_list_desc,                       //0x41
     decode_default,                                 //0x42
     decode_default,                                       //0x43
-    decode_default,                                       //0x44
+    decode_cable_delivery_system_desc,              //0x44
     decode_default,                                       //0x45
     decode_default,                                       //0x46
     decode_default,                                       //0x47
@@ -148,7 +148,7 @@ void (*do_free_descriptors[64])(SDT_DESCRIPTOR_COMMON *ptmp) = {
     free_service_list_desc,               //0x41
     free_desc_default,                                      //0x42
     free_desc_default,                                      //0x43
-    free_desc_default,                                      //0x44
+    free_cable_delivery_system_desc,        //0x44
     free_desc_default,                                      //0x45
     free_desc_default,                                      //0x46
     free_desc_default,                                      //0x47
@@ -254,7 +254,7 @@ void (*do_show_descriptors_info[64])(SDT_DESCRIPTOR_COMMON *ptmp) = {
     show_service_list_descriptor,               //0x41
     show_desc_default,                                       //0x42
     show_desc_default,                                       //0x43
-    show_desc_default,                                       //0x44
+    show_cable_delivery_system_descriptor,      //0x44
     show_desc_default,                                       //0x45
     show_desc_default,                                       //0x46
     show_desc_default,                                       //0x47
