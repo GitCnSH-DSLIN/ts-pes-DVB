@@ -22,6 +22,10 @@
 
 #define PACKET_START_CODE_PREFIX        (0x000001)
 
+#define PSI_SI_PACKET_FLAG  (0)
+
+
+
 //adaption_field_control, 11，标识既有adaptation_field又有payload
 typedef struct ts_package_header
 {
@@ -34,6 +38,17 @@ typedef struct ts_package_header
 	unsigned int adaptation_field_control :2;	// 1 -- only include additional info but not include payload
 	unsigned int continuity_counter :4;	//连续计数器(针对每个pid的计数0~15)
 }TS_PACKET_HEADER, *P_TS_PACKET_HEADER;
+
+#define TS_PACKET_HEADER_SYNC_BYTE(b)                       (b[0])
+#define TS_PACKET_HEADER_TRANS_ERR_INDICATOR(b)             (b[1] >> 7)
+#define TS_PACKET_HEADER_PAYLOAD_UNIT_START_INDICATOR(b)    (b[1] >> 6 & 0x01)
+#define TS_PACKET_HEADER_TRANS_PRIO(b)                      (b[1] >> 5 & 0x01)
+#define TS_PACKET_HEADER_PID(b)                             (((b[1] & 0x1F) << 8) | b[2])
+#define TS_PACKET_HEADER_TRANS_SCRAM_CONTROL(b)             (b[3] >> 6)
+#define TS_PACKET_HEADER_ADAPT_FIELD_CONTROL(b)             (b[3] >> 4) & 0x03)
+#define TS_PACKET_HEADER_CONTINUITY_COUNT(b)                (b[3] & 0x0f)
+
+
 
 
 //自适应区
@@ -115,6 +130,28 @@ typedef struct ts_pmt_table
 
 	unsigned CRC_32 : 32; 
 }TS_PMT_TABLE,*P_TS_PMT_TABLE; 
+
+
+#define TS_PSI_SI_TABLE_ID(b,offset)                    (b[offset])
+#define TS_PSI_SI_TABLE_SECTION_LENGTH(b,offset)        (b[offset + 2])
+#define TS_PSI_SI_TABLE_SECTION_NUM(b,offset)           (b[offset + 6])
+#define TS_PSI_SI_TABLE_LAST_SECTION_NUM(b,offset)      (b[offset + 7])
+
+
+typedef struct table_section_list
+{
+    unsigned int pid;
+    unsigned char table_id;
+    unsigned char section_number;
+    unsigned char last_section_number;
+    unsigned int buffer_size;
+    unsigned char * pbuffer;
+    struct table_section_list * next_section;
+}TABLE_SECTION_LIST, *P_TABLE_SECTION_LIST;
+
+
+
+
 
 
 TS_PAT_Program __ts_pat_program_list;
