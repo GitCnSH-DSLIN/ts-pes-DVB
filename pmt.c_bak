@@ -1,0 +1,191 @@
+/*********************************************************************
+*
+* Filename      :   pmt.c
+* Description   :   fundamental operation of psi protocol of DVB
+* edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
+*
+*********************************************************************/
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <tslib.h>
+#include <pmt.h>
+#include <pat.h>
+#include <ts_list.h>
+#include <print_debug.h>
+
+
+TS_PMT_Stream  __ts_pmt_stream_list;
+
+/*  
+ *  Function    : Init the global pat_program_list and pmt_stream list
+ */
+void init_ts_pmt_stream_list(void)
+{
+    INIT_LIST_HEAD(&__ts_pmt_stream_list.list);
+}
+
+
+/*  
+ *  Function    : Parse the pmt table and add the pmt stream info into
+ *                global list------ts_pmt_stream_list
+ */
+int parse_pmt_table (unsigned char * pBuffer,unsigned int programNumber,
+        TS_PMT_TABLE * psiPMT)  
+{   
+    int pmt_len;
+    int pos_offset;
+    P_TS_PMT_Stream tmp,freetmp;
+    TS_PACKET_HEADER tsPacketHeader;
+    P_TS_PACKET_HEADER ptsPacketHeader = &tsPacketHeader;
+    parse_ts_packet_header(ptsPacketHeader, pBuffer);
+
+    unsigned int offset = locate_offset(ptsPacketHeader,pBuffer, PSI_SI_PACKET_FLAG, 0);
+    unsigned char * buffer = pBuffer;
+    struct list_head *pos;
+
+    psiPMT->table_id                            = PMT_TABLE_ID(buffer, offset);  
+    psiPMT->section_syntax_indicator            = PMT_SECTION_SYNTAX_INDICATOR(buffer, offset);  
+    //psiPMT->zero                                = buffer[1] >> 6 & 0x01;   
+    //psiPMT->reserved_1                          = buffer[1] >> 4 & 0x03;  
+    psiPMT->section_length                      = PMT_SECTION_LENGTH(buffer,offset);      
+    psiPMT->program_number                      = PMT_PROGRAM_NUM(b, offset);  
+    //psiPMT->reserved_2                          = buffer[5] >> 6;  
+    psiPMT->version_number                      = PMT_VERSION_NUM(b, offset);  
+    psiPMT->current_next_indicator              = PMT_CUR_NEXT_INDICATOR(b, offset);  
+    psiPMT->section_number                      = PMT_SECTION_NUM(b, offset);  
+    psiPMT->last_section_number                 = PMT_LAST_SECTION_NUM(b, offset);  
+    //psiPMT->reserved_3                          = buffer[8] >> 5;  
+    psiPMT->PCR_PID                             = PMT_PCR_PID(b,offset);  
+    //psiPMT->reserved_4                          = buffer[10] >> 4;  
+    psiPMT->program_info_length                 = PMT_PROGRAM_INFO_LENGTH(b,offset);   
+    // Get CRC_32    
+    psiPMT->CRC_32  = PMT_CAC32(b,offset);
+
+    buffer += offset;
+   
+    pos_offset = 12;  
+    // program info descriptor  
+    if ( psiPMT->program_info_length != 0 )  
+        pos_offset += psiPMT->program_info_length;      
+        // Get stream type and PID
+    
+
+    //judge to add to __ts_pmt_stream_list or not.
+    tmp =  (P_TS_PMT_Stream)malloc(sizeof(TS_PMT_Stream));
+    freetmp = tmp;
+    list_for_each(pos,&__ts_pmt_stream_list.list)
+    {
+        tmp = list_entry(pos,TS_PMT_Stream, list);
+
+        if(tmp->program_number == programNumber)
+        {
+            free(freetmp);
+            return 0;
+        }
+    }
+    
+
+    //section_length + 2 --> pmt start.  -4 --> CRC
+    for ( ; pos_offset <= (psiPMT->section_length + 2 ) - 4; pos_offset += 5 )  
+    {  
+        tmp = (P_TS_PMT_Stream)malloc(sizeof(TS_PMT_Stream));
+        tmp->stream_type    =  buffer[pos_offset];  
+        tmp->reserved_5     =   buffer[pos_offset+1] >> 5;  
+        tmp->elementary_PID =  ((buffer[pos_offset+1] << 8) | buffer[pos_offset+2]) & 0x1FFF;  
+        tmp->reserved_6     =   buffer[pos_offset+3] >> 4;  
+        tmp->ES_info_length =   (buffer[pos_offset+3] & 0x0F) << 8 | buffer[pos_offset+4];  
+        tmp->program_number = programNumber;
+
+        list_add(&(tmp->list), &(__ts_pmt_stream_list.list));
+
+        if (tmp->ES_info_length != 0)  
+            pos_offset += tmp->ES_info_length;    
+    }  
+    
+    #ifdef DEBUG
+//        show_pmt_stream_info();
+    #endif
+    
+    return 0;  
+}  
+
+//very simple  unknown 0 Video =1  Audio 2
+int judge_media_type(P_TS_PMT_Stream ptsPmtStream)
+{   
+    int mediaType = 0;
+    switch (ptsPmtStream->stream_type)
+    {
+        case 0x01:
+        case 0x02:
+        case 0x1b:
+            //Video
+            mediaType = 1;
+            break;
+        case 0x03:
+        case 0x04:
+        case 0x11:
+        case 0x0f:
+            //Audio
+            mediaType = 2;
+            break;
+        default:
+            break;
+    }
+
+    return mediaType;
+}
+
+
+
+int show_pmt_stream_info(void)
+{
+    struct list_head *pos;
+    P_TS_PMT_Stream tmp = (P_TS_PMT_Stream)malloc(sizeof(TS_PMT_Stream));
+    P_TS_PMT_Stream pFreetmp = tmp;
+    int mediaType = -1;
+    char * mediaTypeString[3] = {"Unknown","Video","Audio"};
+    
+    list_for_each(pos, &__ts_pmt_stream_list.list)
+    {
+        tmp = list_entry(pos,TS_PMT_Stream, list);
+        mediaType = judge_media_type(tmp);
+
+        uprintf("-------------------------------------------\n");
+        uprintf("the program_number is 0x%X(%d)\n",tmp->program_number,tmp->program_number);
+        uprintf("the stream_type is    0x%X(%d)(%s)\n",tmp->stream_type,tmp->stream_type, mediaTypeString[mediaType]);
+        uprintf("the elementary_PID is 0x%X,(%d)\n",tmp->elementary_PID, tmp->elementary_PID);
+        uprintf("-------------------------------------------\n");
+    }
+
+    free(pFreetmp);
+
+    return 0;
+}
+
+int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength)
+{
+    struct list_head *pos;
+    P_TS_PAT_Program tmp_pat_program = (P_TS_PAT_Program)malloc(sizeof(TS_PAT_Program));
+    P_TS_PAT_Program pFreetmp = tmp_pat_program;
+    TS_PMT_TABLE mtsPmtTable;
+        
+    unsigned char * pPacketBuffer = (unsigned char *)malloc(packetLength);
+    unsigned char * pFreebuffer = pPacketBuffer;
+
+    list_for_each(pos, &__ts_pat_program_list.list)
+    {
+        tmp_pat_program = list_entry(pos,TS_PAT_Program, list);
+        find_given_table(pFile, pPacketBuffer, packetLength, tmp_pat_program->program_map_pid);
+        parse_pmt_table(pPacketBuffer, tmp_pat_program->program_number, &mtsPmtTable); 
+    }
+
+    show_pmt_stream_info();
+
+    free(pFreebuffer);
+    free(pFreetmp);
+    
+    fseek(pFile, 0, SEEK_SET);
+    
+    return 0;
+}

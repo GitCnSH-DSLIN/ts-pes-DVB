@@ -144,7 +144,7 @@ typedef struct table_section_list
     unsigned char table_id;
     unsigned char section_number;
     unsigned char last_section_number;
-    unsigned int buffer_size;
+    unsigned int buffer_size;// the buffe_size = section_length + 3 + offset_length
     unsigned char * pbuffer;
     struct table_section_list * next_section;
 }TABLE_SECTION_LIST, *P_TABLE_SECTION_LIST;

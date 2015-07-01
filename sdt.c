@@ -10,7 +10,7 @@
 #include <string.h>
 #include <print_debug.h>
 #include <sdt.h>
-#include <ts_psi.h>
+#include <tslib.h>
 #include <sdt_descriptor.h>
 P_SDT_SERVICE insert_sdt_service_node(SDT_SERVICE * Header, SDT_SERVICE * node)
 {
