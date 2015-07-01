@@ -7,6 +7,19 @@
 *********************************************************************/
 #define PID_TS_PAT          (0x00)
 #define TABLE_ID_TS_PAT     (0x00)
+
+typedef struct ts_pat_program
+{
+    unsigned program_number : 16;
+    unsigned reseved_1 : 3;
+    unsigned program_map_pid : 13;
+    //TS_PMT_Stream pmt_stream_info;
+    struct list_head list;
+}TS_PAT_Program, *P_TS_PAT_Program;
+
+
+//TS_PAT_Program __ts_pat_program_list;
+
 //PAT --  Program Association Table
 typedef struct ts_pat_table
 {
@@ -21,12 +34,14 @@ typedef struct ts_pat_table
 	unsigned current_next_indicator : 1;	//if 1, PAT is available currently
 	unsigned section_number : 8;
 	unsigned last_section_number : 8; 
-	unsigned program_number : 16;
+//	unsigned program_number : 16;
 	unsigned reserved_3 : 3;
 	unsigned network_pid : 13;
-	unsigned program_map_pid : 13; 	//Pid of PMT
-    
-    struct ts_pat_table * next_section;
+//	unsigned program_map_pid : 13; 	//Pid of PMT
+   
+    struct ts_pat_program this_section_program_head;
+
+    struct ts_pat_table * pat_next_section;
     unsigned CRC_32 : 32; 
 }TS_PAT_TABLE,*P_TS_PAT_TABLE;
 
@@ -46,15 +61,12 @@ typedef struct ts_pat_table
                                                     })
 
 
-typedef struct ts_pat_program
-{
-    unsigned program_number : 16;
-    unsigned reseved_1 : 3;
-    unsigned program_map_pid : 13;
-    //TS_PMT_Stream pmt_stream_info;
-    struct list_head list;
-}TS_PAT_Program, *P_TS_PAT_Program;
 
-void init_ts_pat_program_list(void);
-int parse_pat_table(unsigned char * pBuffer,TS_PAT_TABLE * psiPAT);
-int show_pat_program_info(void);
+
+TS_PAT_TABLE * parse_pat_table(FILE *pFile, unsigned int packetLength);
+int parse_pat_table_onesection(unsigned char * pBuffer,TS_PAT_TABLE * psiPAT);
+int show_pat_program_info_onesection(TS_PAT_TABLE * patTable);
+int show_pat_table_info(TS_PAT_TABLE * patTable);
+void free_pat_table(TS_PAT_TABLE * pat_table_header);
+//void init_ts_pat_program_list(void);
+//int show_pat_program_info(void);

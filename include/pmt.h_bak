@@ -5,11 +5,11 @@
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/
-#include <ts_list.h>
+//#include <ts_list.h>
 
-#ifndef	_MPEG_TS_H_
-#define	_MPEG_TS_H_
-
+//#ifndef	_MPEG_TS_H_
+//#define	_MPEG_TS_H_
+#define TABLE_ID_TS_PMT         (0x02)
 
 typedef struct ts_pmt_stream
 {
@@ -21,7 +21,8 @@ typedef struct ts_pmt_stream
     
     struct list_head list;
     unsigned int program_number;
-}TS_PMT_Stream,*P_TS_PMT_Stream;
+}TS_PMT_Stream,* P_TS_PMT_Stream;
+
 
 
 //PMT -- Program Map Table
@@ -64,6 +65,7 @@ typedef struct ts_pmt_table
                                                     })
 
 
+TS_PMT_Stream  __ts_pmt_stream_list;
 
 int parse_pmt_table (unsigned char * pBuffer,unsigned int programNumber,
         TS_PMT_TABLE * psiPMT); 
@@ -72,4 +74,4 @@ int show_pmt_stream_info(void);
 int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength);
 
 
-#endif	//_MPEG_TS_H_
+//#endif	//_MPEG_TS_H_

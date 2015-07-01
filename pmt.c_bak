@@ -15,7 +15,6 @@
 #include <print_debug.h>
 
 
-TS_PMT_Stream  __ts_pmt_stream_list;
 
 /*  
  *  Function    : Init the global pat_program_list and pmt_stream list
@@ -49,18 +48,18 @@ int parse_pmt_table (unsigned char * pBuffer,unsigned int programNumber,
     //psiPMT->zero                                = buffer[1] >> 6 & 0x01;   
     //psiPMT->reserved_1                          = buffer[1] >> 4 & 0x03;  
     psiPMT->section_length                      = PMT_SECTION_LENGTH(buffer,offset);      
-    psiPMT->program_number                      = PMT_PROGRAM_NUM(b, offset);  
+    psiPMT->program_number                      = PMT_PROGRAM_NUM(buffer, offset);  
     //psiPMT->reserved_2                          = buffer[5] >> 6;  
-    psiPMT->version_number                      = PMT_VERSION_NUM(b, offset);  
-    psiPMT->current_next_indicator              = PMT_CUR_NEXT_INDICATOR(b, offset);  
-    psiPMT->section_number                      = PMT_SECTION_NUM(b, offset);  
-    psiPMT->last_section_number                 = PMT_LAST_SECTION_NUM(b, offset);  
+    psiPMT->version_number                      = PMT_VERSION_NUM(buffer, offset);  
+    psiPMT->current_next_indicator              = PMT_CUR_NEXT_INDICATOR(buffer, offset);  
+    psiPMT->section_number                      = PMT_SECTION_NUM(buffer, offset);  
+    psiPMT->last_section_number                 = PMT_LAST_SECTION_NUM(buffer, offset);  
     //psiPMT->reserved_3                          = buffer[8] >> 5;  
-    psiPMT->PCR_PID                             = PMT_PCR_PID(b,offset);  
+    psiPMT->PCR_PID                             = PMT_PCR_PID(buffer,offset);  
     //psiPMT->reserved_4                          = buffer[10] >> 4;  
-    psiPMT->program_info_length                 = PMT_PROGRAM_INFO_LENGTH(b,offset);   
+    psiPMT->program_info_length                 = PMT_PROGRAM_INFO_LENGTH(buffer,offset);   
     // Get CRC_32    
-    psiPMT->CRC_32  = PMT_CAC32(b,offset);
+    psiPMT->CRC_32  = PMT_CAC32(buffer,offset);
 
     buffer += offset;
    
@@ -163,26 +162,26 @@ int show_pmt_stream_info(void)
     return 0;
 }
 
+
 int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength)
 {
     struct list_head *pos;
     P_TS_PAT_Program tmp_pat_program = (P_TS_PAT_Program)malloc(sizeof(TS_PAT_Program));
     P_TS_PAT_Program pFreetmp = tmp_pat_program;
     TS_PMT_TABLE mtsPmtTable;
-        
-    unsigned char * pPacketBuffer = (unsigned char *)malloc(packetLength);
-    unsigned char * pFreebuffer = pPacketBuffer;
 
     list_for_each(pos, &__ts_pat_program_list.list)
     {
         tmp_pat_program = list_entry(pos,TS_PAT_Program, list);
-        find_given_table(pFile, pPacketBuffer, packetLength, tmp_pat_program->program_map_pid);
+        TABLE_SECTION_LIST *pmt_table = store_psi_si_table(pFile, packetLength, tmp_pat_program->program_map_pid, TABLE_ID_TS_PMT);
+        TABLE_SECTION_LIST *pmt_index = pmt_table;
+        while()
+        
         parse_pmt_table(pPacketBuffer, tmp_pat_program->program_number, &mtsPmtTable); 
     }
 
     show_pmt_stream_info();
 
-    free(pFreebuffer);
     free(pFreetmp);
     
     fseek(pFile, 0, SEEK_SET);

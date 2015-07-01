@@ -20,9 +20,10 @@ int main(int argc, char * argv[])
         uprintf("Open file failed\n");
         return -1;
     }
-    init_ts_pat_program_list();    
+    //init_ts_pat_program_list();    
 
     /*************************************************************************/
+#if 0
     TABLE_SECTION_LIST * pat_table = store_psi_si_table(pFile, packetLength, PID_TS_PAT, TABLE_ID_TS_PAT);
     TABLE_SECTION_LIST * pat_index = pat_table;
 
@@ -32,13 +33,18 @@ int main(int argc, char * argv[])
     while(NULL != pat_index)
     {
         parse_pat_table(pat_index->pbuffer, ptsPatTable + i);
+        show_pat_table_info(ptsPatTable + i);
         i++;
         pat_index = pat_index->next_section;
     }
-    
     free(ptsPatTable);
-
-	fclose(pFile);
+#endif
+    TS_PAT_TABLE *pat_table_head = parse_pat_table(pFile, packetLength);
+    show_pat_table_info(pat_table_head);
+    show_pat_table_info(pat_table_head);
+    free_pat_table(pat_table_head);
+	
+    fclose(pFile);
 
 
     return 0;
