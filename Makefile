@@ -18,7 +18,7 @@ if [ ! -d $(OBJDIR_O) ];then mkdir $(OBJDIR_O);fi
 @echo ''
 endef
 
-TARGET=test_pat
+TARGET=test_pat test_pmt
 
 all: $(TARGET)
 	@echo "***********************************************"
@@ -30,6 +30,8 @@ clean:
 	rm -f $(TARGET) *.o ./descriptors/*.o
 
 test_pat:$(OBJS)
+	$(CC) -o $@ $^ $(CFLAGS)
+test_pmt:$(OBJS)
 	$(CC) -o $@ $^ $(CFLAGS)
 $(OBJS) : $(SRCS)
 

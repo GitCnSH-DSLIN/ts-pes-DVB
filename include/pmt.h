@@ -9,6 +9,8 @@
 
 //#ifndef	_MPEG_TS_H_
 //#define	_MPEG_TS_H_
+#include <sdt.h>
+
 #define TABLE_ID_TS_PMT         (0x02)
 
 typedef struct ts_pmt_stream
@@ -22,7 +24,6 @@ typedef struct ts_pmt_stream
     struct list_head list;
     unsigned int program_number;
 }TS_PMT_Stream,* P_TS_PMT_Stream;
-
 
 
 //PMT -- Program Map Table
@@ -43,6 +44,11 @@ typedef struct ts_pmt_table
 	unsigned PCR_PID : 13;
 	unsigned reserved_4 : 4;
 	unsigned program_info_length : 12;	//bytes number
+
+    SDT_DESCRIPTOR_COMMON * first_desc;
+
+    struct ts_pmt_stream this_section_pmt_stream_head;
+    struct ts_pmt_table * pmt_next_section;
 
 	unsigned CRC_32 : 32; 
 }TS_PMT_TABLE,*P_TS_PMT_TABLE; 
@@ -65,13 +71,16 @@ typedef struct ts_pmt_table
                                                     })
 
 
-TS_PMT_Stream  __ts_pmt_stream_list;
 
-int parse_pmt_table (unsigned char * pBuffer,unsigned int programNumber,
-        TS_PMT_TABLE * psiPMT); 
+int parse_pmt_table_one_program(FILE *pFile, unsigned int packetLength,
+        unsigned int programNumber);
+int parse_pmt_table_onesection(unsigned char * pBuffer, TS_PMT_TABLE * psiPMT, unsigned int programNumber); 
 int judge_media_type(P_TS_PMT_Stream ptsPmtStream);
-int show_pmt_stream_info(void);
-int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength);
+int show_pmt_stream_info_onesection(TS_PMT_TABLE * pmtTable);
+int show_pmt_table_info_one_program(TS_PMT_TABLE * pmtTable);
+
+//TS_PMT_Stream  __ts_pmt_stream_list;
+//int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength);
 
 
 //#endif	//_MPEG_TS_H_

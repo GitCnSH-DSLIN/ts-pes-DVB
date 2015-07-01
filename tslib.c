@@ -268,6 +268,8 @@ TABLE_SECTION_LIST * table_section_list_add(TABLE_SECTION_LIST *head, TABLE_SECT
     TABLE_SECTION_LIST * p_section_head = NULL;
     TABLE_SECTION_LIST * p_section_node = NULL;
 
+    fseek(pFile, 0, SEEK_SET);
+
     while((fread(tmp_ts_buffer, mPacketLength, 1, pFile) == 1))
     {
         parse_ts_packet_header(ptsPacketHeader, tmp_ts_buffer);
