@@ -5,7 +5,7 @@
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/
-#include <ts_psi.h>
+#include <tslib.h>
 
 
 #define DATA_END_VAL (0xFFFFFFFF)

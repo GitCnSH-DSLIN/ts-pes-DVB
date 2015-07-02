@@ -18,7 +18,7 @@ if [ ! -d $(OBJDIR_O) ];then mkdir $(OBJDIR_O);fi
 @echo ''
 endef
 
-TARGET=test_pes
+TARGET=test_ca_pid_emm
 
 all: $(TARGET)
 	@echo "***********************************************"
@@ -29,7 +29,7 @@ all: $(TARGET)
 clean:
 	rm -f $(TARGET) *.o ./descriptors/*.o
 
-test_pes:$(OBJS)
+test_ca_pid_emm:$(OBJS)
 	$(CC) -o $@ $^ $(CFLAGS)
 $(OBJS) : $(SRCS)
 

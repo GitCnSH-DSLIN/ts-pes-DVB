@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ca_pid_emm.h>
-#include <ts_psi.h>
+#include <tslib.h>
 #include <ts_list.h>
 #include <print_debug.h>
 
