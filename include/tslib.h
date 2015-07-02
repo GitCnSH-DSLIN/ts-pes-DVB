@@ -74,5 +74,25 @@ typedef struct table_section_list
 #define TS_PSI_SI_TABLE_SECTION_NUM(b,offset)           (b[offset + 6])
 #define TS_PSI_SI_TABLE_LAST_SECTION_NUM(b,offset)      (b[offset + 7])
 
+int parse_ts_packet_header(TS_PACKET_HEADER *packet_head, unsigned char *buffer);
+
+int show_ts_packet_header(TS_PACKET_HEADER *packet_head);
+
+unsigned int locate_offset(TS_PACKET_HEADER *packet_head, unsigned char *buffer,
+        unsigned int psi_flag, unsigned int * pes_start);
+
+int store_one_section_data(FILE *pFile, unsigned int mPacketLength, 
+        TABLE_SECTION_LIST * p_table_section);
+
+TABLE_SECTION_LIST * alloc_and_init_table_section(unsigned char * tmp_ts_buffer, 
+        unsigned int section_num, unsigned int offset_length);
+
+TABLE_SECTION_LIST * table_section_list_add(TABLE_SECTION_LIST *head, TABLE_SECTION_LIST *node);
+ 
+TABLE_SECTION_LIST * store_psi_si_table(FILE *pFile, unsigned int mPacketLength, 
+        unsigned int mUserPid,unsigned int tableId);
+
+void show_packet_memory(unsigned char * buffer, unsigned int packetLength);
+
 #endif	//_MPEG_TS_H_
 

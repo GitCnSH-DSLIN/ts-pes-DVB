@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sdt.h>
+#include <sdt_descriptor.h>
 #include <desc_cable_delivery_system.h>
 #include <print_debug.h>
 

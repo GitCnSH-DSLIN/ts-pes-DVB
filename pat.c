@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-//#include <ts_psi.h>
 #include <tslib.h>
 #include <pat.h>
 #include <ts_list.h>
@@ -73,7 +72,6 @@ TS_PAT_TABLE * parse_pat_table(FILE *pFile, unsigned int packetLength)
 int parse_pat_table_onesection(unsigned char * pBuffer,TS_PAT_TABLE * psiPAT)
 {
 
-    int pat_len = 0;
     unsigned short program_num;
     int ret=0, n = 0;
     P_TS_PAT_Program tmp = NULL;
@@ -274,8 +272,7 @@ int search_given_program_info(unsigned int searchProgramId)
     
     struct list_head *pos;
     
-    P_TS_PAT_Program tmp = (P_TS_PAT_Program)malloc(sizeof(TS_PAT_Program));
-    P_TS_PAT_Program pFreetmp = tmp;
+    P_TS_PAT_Program tmp = NULL;
 
     list_for_each(pos, &__ts_pat_program_list.list)
     {
@@ -291,8 +288,6 @@ int search_given_program_info(unsigned int searchProgramId)
         uprintf("Can't find the program info pid\n");
     else
         uprintf("We find the given program info pid\n");
-
-    free(pFreetmp);
 
     return programPid;    
 }

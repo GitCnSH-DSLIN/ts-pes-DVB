@@ -28,21 +28,18 @@ int main(int argc, char * argv[])
     TS_PAT_TABLE *pat_table_head = parse_pat_table(pFile, packetLength);
     //show_pat_table_info(pat_table_head);
     show_pat_program_info();
-    show_pat_table_info(pat_table_head);
-    free_pat_table(pat_table_head);
-    show_pat_table_info(pat_table_head);
-    show_pat_program_info();
-    
-#if 0    
+   
+#if 0
     init_ts_pmt_stream_list();
     unsigned int programPID = search_given_program_info(102);    
     TS_PMT_TABLE *pmt_table_one_program_head = parse_pmt_table_one_program(pFile, packetLength,102, programPID);
     show_pmt_table_info_one_program(pmt_table_one_program_head);
     show_pmt_stream_info();
 #endif
-//    init_ts_pmt_stream_list();
-//    setup_pmt_stream_list(pFile, packetLength);
+    init_ts_pmt_stream_list();
+    setup_pmt_stream_list(pFile, packetLength);
     
+    show_pmt_stream_info();
 
 //    free_pat_table(pat_table_head);
 	

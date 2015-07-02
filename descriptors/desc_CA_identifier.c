@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sdt.h>
+#include <sdt_descriptor.h>
 #include <print_debug.h>
 #include <desc_CA_identifier.h>
 

@@ -28,7 +28,7 @@ void init_ts_pmt_stream_list(void)
  *  Function    : Parse the pmt table and add the pmt stream info into
  *                global list------ts_pmt_stream_list
  */
-int parse_pmt_table_one_program(FILE *pFile, unsigned int packetLength,
+TS_PMT_TABLE * parse_pmt_table_one_program(FILE *pFile, unsigned int packetLength,
         unsigned int programNumber, unsigned int programPid)  
 {   
 
@@ -85,7 +85,6 @@ int parse_pmt_table_onesection(unsigned char * pBuffer, TS_PMT_TABLE * psiPMT,
         unsigned int programNumber, unsigned int porgramPid) 
 {    
     
-    int pmt_len;
     int pos_offset;
     P_TS_PMT_Stream tmp,freetmp;
     TS_PACKET_HEADER tsPacketHeader;
@@ -163,40 +162,58 @@ int parse_pmt_table_onesection(unsigned char * pBuffer, TS_PMT_TABLE * psiPMT,
     return 0;  
 }  
 
+
+void __remove_ts_pmt_stream_list_node(unsigned int elementary_PID)
+{
+
+    struct list_head *pos, *n;
+    P_TS_PMT_Stream tmp = NULL;
+    
+    list_for_each_safe(pos, n, &__ts_pmt_stream_list.list)
+    {
+        //del node from __ts_pmt_stream_list
+        tmp = list_entry(pos,TS_PMT_Stream, list);
+        if(tmp->elementary_PID == elementary_PID)
+        {
+            list_del_init(pos);
+            break;
+        }
+
+    }
+
+}
+
 //have issues, need debug
-void free_pmt_table_onesection(TS_PMT_TABLE * pmt_table)
+void free_pmt_table_onesection(TS_PMT_TABLE * pmt_table, int reserve_pmt_list_flag)
 {
     struct list_head *pos, *n;
-    P_TS_PMT_Stream tmp = (P_TS_PMT_Stream)malloc(sizeof(TS_PMT_Stream));
-    P_TS_PMT_Stream pFreetmp = tmp;
+    P_TS_PMT_Stream tmp = NULL;
 
-    //list_for_each_safe(pos, n, &(pat_table->this_section_program_head.list));
-    list_for_each(pos, &(pmt_table->this_section_pmt_stream_head.program_list))
+    list_for_each_safe(pos, n, &(pmt_table->this_section_pmt_stream_head.program_list))
     {
         tmp = list_entry(pos,TS_PMT_Stream, program_list);
         list_del_init(pos);
-        
+
+        //del node from __ts_pmt_stream_list
+        if(!reserve_pmt_list_flag)
+        {
+            __remove_ts_pmt_stream_list_node(tmp->elementary_PID);
+            free(tmp);
+        }
+        tmp = NULL;
     }
 
-    list_for_each(pos, &__ts_pmt_stream_list.list)
-    {
-        tmp = list_entry(pos,TS_PMT_Stream, list);
-        list_del_init(pos);
-        free(tmp);
-    }
-
-    free(pFreetmp);
 }
 
 
-void free_pmt_table_one_program(TS_PMT_TABLE * pmt_table_header)
+void free_pmt_table_one_program(TS_PMT_TABLE * pmt_table_header, int reserve_pmt_list_flag )
 {
     TS_PMT_TABLE *tmp = pmt_table_header;
     unsigned int *ptmp = (unsigned int *)tmp;
 
     while(NULL != tmp && (ptmp[0] | ptmp[1]) != 0)
     {
-        free_pmt_table_onesection(tmp);
+        free_pmt_table_onesection(tmp, reserve_pmt_list_flag);
         tmp++;
         //to jedge if goto the end. last_8 byte.
         ptmp = (unsigned int *)tmp;
@@ -285,6 +302,7 @@ int show_pmt_table_info_one_program(TS_PMT_TABLE * pmtTable)
         //to jedge if goto the end. last_8 byte.
         ptmp = (unsigned int *)tmp;
     }
+    return 0;
 }
 
 
@@ -321,7 +339,6 @@ int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength)
     struct list_head *pos;
     P_TS_PAT_Program tmp_pat_program = (P_TS_PAT_Program)malloc(sizeof(TS_PAT_Program));
     P_TS_PAT_Program pFreetmp = tmp_pat_program;
-    TS_PMT_TABLE mtsPmtTable;
         
     unsigned char * pPacketBuffer = (unsigned char *)malloc(packetLength);
     unsigned char * pFreebuffer = pPacketBuffer;
@@ -331,9 +348,12 @@ int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength)
         tmp_pat_program = list_entry(pos,TS_PAT_Program, list);
         TS_PMT_TABLE *pmt_table_one_program_head = parse_pmt_table_one_program(pFile, packetLength,
                 tmp_pat_program->program_number, tmp_pat_program->program_map_pid);
+        //we only reserve the __ts_pmt_stream_list, others we will free;
+        //need optimized  1 meaning reserved
+        free_pmt_table_one_program(pmt_table_one_program_head, 1);
     }
 
-    show_pmt_stream_info();
+//    show_pmt_stream_info();
 
     free(pFreebuffer);
     free(pFreetmp);

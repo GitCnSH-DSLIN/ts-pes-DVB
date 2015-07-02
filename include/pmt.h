@@ -75,12 +75,12 @@ TS_PMT_Stream  __ts_pmt_stream_list;
 void init_ts_pmt_stream_list(void);
 
 
-int parse_pmt_table_one_program(FILE *pFile, unsigned int packetLength,
+TS_PMT_TABLE * parse_pmt_table_one_program(FILE *pFile, unsigned int packetLength,
         unsigned int programNumber, unsigned int programPid);  
 int parse_pmt_table_onesection(unsigned char * pBuffer, TS_PMT_TABLE * psiPMT, 
         unsigned int programNumber, unsigned int porgramPid); 
-void free_pmt_table_onesection(TS_PMT_TABLE * pmt_table);
-void free_pmt_table_one_program(TS_PMT_TABLE * pmt_table_header);
+void free_pmt_table_onesection(TS_PMT_TABLE * pmt_table, int reserve_pmt_list_flag);
+void free_pmt_table_one_program(TS_PMT_TABLE * pmt_table_header, int reserve_pmt_list_flag);
 
 int judge_media_type(P_TS_PMT_Stream ptsPmtStream);
 int show_pmt_stream_info_onesection(TS_PMT_TABLE * pmtTable);

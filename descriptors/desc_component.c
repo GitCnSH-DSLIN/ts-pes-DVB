@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sdt.h>
+#include <sdt_descriptor.h>
 #include <desc_component.h>
 #include <print_debug.h>
 
