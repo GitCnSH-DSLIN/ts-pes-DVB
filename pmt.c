@@ -29,11 +29,11 @@ void init_ts_pmt_stream_list(void)
  *                global list------ts_pmt_stream_list
  */
 int parse_pmt_table_one_program(FILE *pFile, unsigned int packetLength,
-        unsigned int programNumber)  
+        unsigned int programNumber, unsigned int programPid)  
 {   
 
     TABLE_SECTION_LIST * pmt_section_one_program_head = store_psi_si_table(pFile, packetLength,
-            programNumber, TABLE_ID_TS_PMT);
+            programPid, TABLE_ID_TS_PMT);
 
     TABLE_SECTION_LIST * pmt_section_one_program_index = pmt_section_one_program_head;
 
@@ -46,7 +46,8 @@ int parse_pmt_table_one_program(FILE *pFile, unsigned int packetLength,
 
     while(NULL != pmt_section_one_program_index)
     {
-        parse_pmt_table_onesection(pmt_section_one_program_index->pbuffer, pmt_table_one_program_iloop + i, programNumber);
+        parse_pmt_table_onesection(pmt_section_one_program_index->pbuffer, pmt_table_one_program_iloop + i, 
+                programNumber, programPid);
         i++;
         pmt_section_one_program_index = pmt_section_one_program_index->next_section;
     }
@@ -80,7 +81,8 @@ int parse_pmt_table_one_program(FILE *pFile, unsigned int packetLength,
 
     
     
-int parse_pmt_table_onesection(unsigned char * pBuffer, TS_PMT_TABLE * psiPMT, unsigned int programNumber) 
+int parse_pmt_table_onesection(unsigned char * pBuffer, TS_PMT_TABLE * psiPMT, 
+        unsigned int programNumber, unsigned int porgramPid) 
 {    
     
     int pmt_len;
@@ -160,6 +162,49 @@ int parse_pmt_table_onesection(unsigned char * pBuffer, TS_PMT_TABLE * psiPMT, u
     
     return 0;  
 }  
+
+//have issues, need debug
+void free_pmt_table_onesection(TS_PMT_TABLE * pmt_table)
+{
+    struct list_head *pos, *n;
+    P_TS_PMT_Stream tmp = (P_TS_PMT_Stream)malloc(sizeof(TS_PMT_Stream));
+    P_TS_PMT_Stream pFreetmp = tmp;
+
+    //list_for_each_safe(pos, n, &(pat_table->this_section_program_head.list));
+    list_for_each(pos, &(pmt_table->this_section_pmt_stream_head.program_list))
+    {
+        tmp = list_entry(pos,TS_PMT_Stream, program_list);
+        list_del_init(pos);
+        
+    }
+
+    list_for_each(pos, &__ts_pmt_stream_list.list)
+    {
+        tmp = list_entry(pos,TS_PMT_Stream, list);
+        list_del_init(pos);
+        free(tmp);
+    }
+
+    free(pFreetmp);
+}
+
+
+void free_pmt_table_one_program(TS_PMT_TABLE * pmt_table_header)
+{
+    TS_PMT_TABLE *tmp = pmt_table_header;
+    unsigned int *ptmp = (unsigned int *)tmp;
+
+    while(NULL != tmp && (ptmp[0] | ptmp[1]) != 0)
+    {
+        free_pmt_table_onesection(tmp);
+        tmp++;
+        //to jedge if goto the end. last_8 byte.
+        ptmp = (unsigned int *)tmp;
+    } 
+
+    free(pmt_table_header);
+    pmt_table_header = NULL;
+}
 
 //very simple  unknown 0 Video =1  Audio 2
 int judge_media_type(P_TS_PMT_Stream ptsPmtStream)
@@ -271,43 +316,35 @@ int show_pmt_stream_info(void)
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-#if 0
 int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength)
 {
     struct list_head *pos;
     P_TS_PAT_Program tmp_pat_program = (P_TS_PAT_Program)malloc(sizeof(TS_PAT_Program));
     P_TS_PAT_Program pFreetmp = tmp_pat_program;
     TS_PMT_TABLE mtsPmtTable;
+        
+    unsigned char * pPacketBuffer = (unsigned char *)malloc(packetLength);
+    unsigned char * pFreebuffer = pPacketBuffer;
 
     list_for_each(pos, &__ts_pat_program_list.list)
     {
         tmp_pat_program = list_entry(pos,TS_PAT_Program, list);
-        TABLE_SECTION_LIST *pmt_table = store_psi_si_table(pFile, packetLength, tmp_pat_program->program_map_pid, TABLE_ID_TS_PMT);
-        TABLE_SECTION_LIST *pmt_index = pmt_table;
-        while()
-        
-        parse_pmt_table(pPacketBuffer, tmp_pat_program->program_number, &mtsPmtTable); 
+        TS_PMT_TABLE *pmt_table_one_program_head = parse_pmt_table_one_program(pFile, packetLength,
+                tmp_pat_program->program_number, tmp_pat_program->program_map_pid);
     }
 
     show_pmt_stream_info();
 
+    free(pFreebuffer);
     free(pFreetmp);
     
     fseek(pFile, 0, SEEK_SET);
     
     return 0;
 }
-#endif
+
+
+
+
+
+

@@ -142,8 +142,7 @@ int parse_pat_table_onesection(unsigned char * pBuffer,TS_PAT_TABLE * psiPAT)
 int show_pat_program_info_onesection(TS_PAT_TABLE * patTable)
 {
     struct list_head *pos;
-    P_TS_PAT_Program tmp = (P_TS_PAT_Program)malloc(sizeof(TS_PAT_Program));
-    P_TS_PAT_Program pFreetmp = tmp;
+    P_TS_PAT_Program tmp = NULL;
 
     list_for_each(pos, &(patTable->this_section_program_head.section_list))
     {
@@ -154,7 +153,6 @@ int show_pat_program_info_onesection(TS_PAT_TABLE * patTable)
         uprintf("-------------------------------------------\n");
     }
 
-    free(pFreetmp);
     
     return 0;
 }
@@ -185,20 +183,45 @@ int show_pat_table_info(TS_PAT_TABLE * patTable)
     }
 }
 
+
+
+void __remove_ts_pat_program_list_node(unsigned int program_number)
+{
+
+    struct list_head *pos, *n;
+    P_TS_PAT_Program tmp = NULL;
+    
+    list_for_each_safe(pos, n, &__ts_pat_program_list.list)
+    {
+        //del node from __ts_pat_program_list
+        tmp = list_entry(pos,TS_PAT_Program, list);
+        if(tmp->program_number == program_number)
+        {
+            list_del_init(pos);
+            break;
+        }
+
+    }
+}
+
 void free_pat_program_info_onesection(TS_PAT_TABLE * pat_table)
 {
     struct list_head *pos, *n;
-    P_TS_PAT_Program tmp = (P_TS_PAT_Program)malloc(sizeof(TS_PAT_Program));
-    P_TS_PAT_Program pFreetmp = tmp;
+    P_TS_PAT_Program tmp = NULL;
 
-    //list_for_each_safe(pos, n, &(pat_table->this_section_program_head.list));
-    list_for_each(pos, &(pat_table->this_section_program_head.section_list))
+    list_for_each_safe(pos, n, &(pat_table->this_section_program_head.section_list))
     {
+        //del node from this section_program_head list
         tmp = list_entry(pos,TS_PAT_Program, section_list);
-        free(tmp);
-    }
 
-    free(pFreetmp);
+        list_del_init(pos);
+        
+        //del node from __ts_pat_program_list
+        __remove_ts_pat_program_list_node(tmp->program_number);
+        free(tmp);
+        tmp = NULL;
+    }
+    
 }
 
 
@@ -225,8 +248,13 @@ void free_pat_table(TS_PAT_TABLE * pat_table_header)
 int show_pat_program_info(void)
 {
     struct list_head *pos;
-    P_TS_PAT_Program tmp = (P_TS_PAT_Program)malloc(sizeof(TS_PAT_Program));
-    P_TS_PAT_Program pFreetmp = tmp;
+    P_TS_PAT_Program tmp = NULL;
+
+    if(list_empty(&__ts_pat_program_list.list))
+    {
+        uprintf("Empty list \n");
+        return 0;
+    }
 
     list_for_each(pos, &__ts_pat_program_list.list)
     {
@@ -236,9 +264,36 @@ int show_pat_program_info(void)
         uprintf("the program_map_pid 0x%X(%d)\n",tmp->program_map_pid, tmp->program_map_pid);
         uprintf("-------------------------------------------\n");
     }
-
-    free(pFreetmp);
     
     return 0;
+}
+
+int search_given_program_info(unsigned int searchProgramId)
+{
+    int programPid = -1;
+    
+    struct list_head *pos;
+    
+    P_TS_PAT_Program tmp = (P_TS_PAT_Program)malloc(sizeof(TS_PAT_Program));
+    P_TS_PAT_Program pFreetmp = tmp;
+
+    list_for_each(pos, &__ts_pat_program_list.list)
+    {
+        tmp = list_entry(pos,TS_PAT_Program, list);
+        if (tmp->program_number == searchProgramId)
+        {
+            programPid = tmp->program_map_pid;
+            break;
+        }
+    }
+
+    if(-1 == programPid)
+        uprintf("Can't find the program info pid\n");
+    else
+        uprintf("We find the given program info pid\n");
+
+    free(pFreetmp);
+
+    return programPid;    
 }
 
