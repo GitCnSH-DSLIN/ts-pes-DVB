@@ -15,6 +15,7 @@
 
 #define	TS_SYNC_BYTE_VAL		(0x47)
 #define PSI_SI_PACKET_FLAG  (0)
+#define PES_PACKET_FLAG  (0)
 #define SECTION_INFO_HEADER_SIZE (3)
 
 
