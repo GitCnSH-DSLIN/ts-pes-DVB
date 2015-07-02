@@ -143,13 +143,19 @@ int store_one_section_data(FILE *pFile, unsigned int mPacketLength, TABLE_SECTIO
                 && (section_number == TS_PSI_SI_TABLE_SECTION_NUM(ptsbuffer,offset_length)) 
                 && (1 == TS_PACKET_HEADER_PAYLOAD_UNIT_START_INDICATOR(ptsbuffer)))
         {
-            uprintf("We find the start of the %d section.\n",section_number);
             ret = 0;
-
+            //uprintf("the section length is %d\n",TS_PSI_SI_TABLE_SECTION_LENGTH(ptsbuffer, offset_length));
+            unsigned int continuity_counter = ptsPacketHeader->continuity_counter;            
             p_table_section->buffer_size    = TS_PSI_SI_TABLE_SECTION_LENGTH(ptsbuffer, offset_length) + SECTION_INFO_HEADER_SIZE + offset_length;
+            //uprintf("the value of buffer_size if %d\n", p_table_section->buffer_size);
             buffer_size                     = p_table_section->buffer_size;
             section_size                    = buffer_size - SECTION_INFO_HEADER_SIZE - offset_length;
             p_table_section->pbuffer        = (unsigned char *)malloc(buffer_size);
+            if(NULL == p_table_section->pbuffer)
+            {
+                uprintf("malloc %d byte failed, try again\n",buffer_size);
+                p_table_section->pbuffer        = (unsigned char *)malloc(buffer_size);
+            }
             unsigned char *pbuffer_index    = p_table_section->pbuffer;
             //for the payload_unit_start, we directory copy from the ts start byte----sync.(other ts packet don't have the
             //table id and so on
@@ -165,6 +171,8 @@ int store_one_section_data(FILE *pFile, unsigned int mPacketLength, TABLE_SECTIO
                     if(0 == copy_count)
                     {
                         memcpy(pbuffer_index, ptsbuffer, mPacketLength);
+              //          uprintf("the offset_length is %d and copy_count is 0\n",offset_length);
+              //          show_packet_memory(ptsbuffer, mPacketLength);
                         copy_count++;
                         pbuffer_index += mPacketLength;
                         buffer_size   -= mPacketLength;
@@ -172,23 +180,31 @@ int store_one_section_data(FILE *pFile, unsigned int mPacketLength, TABLE_SECTIO
                     else
                     {
                         if(fread(ptsbuffer, mPacketLength, 1, pFile) !=1 )
+                        {
                             fseek(pFile, 0, SEEK_SET);
+                            fread(ptsbuffer, mPacketLength, 1, pFile);
+                        }
 
                         parse_ts_packet_header(ptsPacketHeader, ptsbuffer);
                         offset_length = locate_offset(ptsPacketHeader, ptsbuffer, PSI_SI_PACKET_FLAG, 0);
 
-                        if(pid == ptsPacketHeader->pid && table_id == TS_PSI_SI_TABLE_ID(ptsbuffer, offset_length)
-                                &&  (section_number == TS_PSI_SI_TABLE_SECTION_NUM(ptsbuffer,offset_length))) 
+                        if(pid == ptsPacketHeader->pid
+                                && ptsPacketHeader->continuity_counter == continuity_counter + copy_count) 
                         {
                             if(copy_count == copy_loop_total)
                             {
                                 memcpy(pbuffer_index, ptsbuffer + offset_length, buffer_size);
                                 pbuffer_index += buffer_size;
+                                uprintf("the offset_length is %d and copy_count is %d\n",offset_length,copy_count);
+                                show_packet_memory(ptsbuffer, buffer_size);
                             }
                             else
                             {
                                 memcpy(pbuffer_index, ptsbuffer + offset_length, mPacketLength-offset_length);
+                                uprintf("the offset_length is %d and copy_count is %d\n",offset_length,copy_count);
+                                show_packet_memory(ptsbuffer, mPacketLength);
                                 pbuffer_index += mPacketLength - offset_length;
+                                buffer_size   -= (mPacketLength - offset_length);
                             }
 
                             copy_count++;
@@ -287,6 +303,8 @@ TABLE_SECTION_LIST * table_section_list_add(TABLE_SECTION_LIST *head, TABLE_SECT
                 {
                     p_section_head = alloc_and_init_table_section(tmp_ts_buffer, i, offset_length);
                     store_one_section_data(pFile, mPacketLength, p_section_head);
+
+                    show_packet_memory(p_section_head->pbuffer,p_section_head->buffer_size);
                 }
                 else
                 {

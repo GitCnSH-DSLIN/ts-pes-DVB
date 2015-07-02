@@ -19,21 +19,18 @@ int main(int argc, char * argv[])
     unsigned int packetLength = TS_PACKET_SIZE;    
     unsigned char storeIdStream[20]={'\0'};
 
-    //if((pFile = fopen("ocn_203.ts","rb")) == NULL)
-    if((pFile = fopen("EMMStressSoakTest_V3.11.9.mpg","rb")) == NULL)
+    if((pFile = fopen("ocn_203.ts","rb")) == NULL)
     {
         uprintf("Open file failed\n");
         return -1;
     }
+    /**************************************************************************/
+    TS_SDT_TABLE * sdt_table_head = parse_sdt_table(pFile, packetLength);
 
-    unsigned int caPid = 0x500;
-    unsigned int ts_packet_length = TS_PACKET_LENGTH;
-    CA_PID_EMM * pcaPidEmmHeader = (P_CA_PID_EMM)malloc(sizeof(CA_PID_EMM));
-    pcaPidEmmHeader->next_section = NULL;
-    load_ca_pid_emm(pFile, caPid, pcaPidEmmHeader, ts_packet_length);
-    
-    show_ca_pid_emm_list_info(pcaPidEmmHeader);
-    free_ca_pid_emm_list(pcaPidEmmHeader);
+    show_sdt_table_info(sdt_table_head);
+    free_sdt_table(sdt_table_head);
+    sdt_table_head = NULL;
+    /**************************************************************************/
     
     fclose(pFile);
 

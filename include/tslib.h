@@ -15,7 +15,7 @@
 
 #define	TS_SYNC_BYTE_VAL		(0x47)
 #define PSI_SI_PACKET_FLAG  (0)
-#define PES_PACKET_FLAG  (0)
+#define PES_PACKET_FLAG  (1)
 #define SECTION_INFO_HEADER_SIZE (3)
 
 
@@ -71,7 +71,7 @@ typedef struct table_section_list
 }TABLE_SECTION_LIST, *P_TABLE_SECTION_LIST;
 
 #define TS_PSI_SI_TABLE_ID(b,offset)                    (b[offset])
-#define TS_PSI_SI_TABLE_SECTION_LENGTH(b,offset)        (b[offset + 2])
+#define TS_PSI_SI_TABLE_SECTION_LENGTH(b,offset)        ((b[offset + 1] & 0x0F) << 8 | (b[offset + 2]))
 #define TS_PSI_SI_TABLE_SECTION_NUM(b,offset)           (b[offset + 6])
 #define TS_PSI_SI_TABLE_LAST_SECTION_NUM(b,offset)      (b[offset + 7])
 
