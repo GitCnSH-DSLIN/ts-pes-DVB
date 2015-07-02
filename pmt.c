@@ -14,7 +14,13 @@
 #include <ts_list.h>
 #include <print_debug.h>
 
-
+/*  
+ *  Function    : Init the global __ts_pmt_stream_list
+ */
+void init_ts_pmt_stream_list(void)
+{
+    INIT_LIST_HEAD(&__ts_pmt_stream_list.list);
+}
 
 
 
@@ -106,7 +112,7 @@ int parse_pmt_table_onesection(unsigned char * pBuffer, TS_PMT_TABLE * psiPMT, u
     // Get CRC_32    
     psiPMT->CRC_32  = PMT_CAC32(buffer,offset);
     
-    INIT_LIST_HEAD(&(psiPMT->this_section_pmt_stream_head.list));
+    INIT_LIST_HEAD(&(psiPMT->this_section_pmt_stream_head.program_list));
 
     buffer += offset;
    
@@ -115,6 +121,20 @@ int parse_pmt_table_onesection(unsigned char * pBuffer, TS_PMT_TABLE * psiPMT, u
     if ( psiPMT->program_info_length != 0 )  
         pos_offset += psiPMT->program_info_length;      
         // Get stream type and PID
+
+    //judge to add to __ts_pmt_stream_list or not.
+    tmp =  (P_TS_PMT_Stream)malloc(sizeof(TS_PMT_Stream));
+    freetmp = tmp;
+    list_for_each(pos,&__ts_pmt_stream_list.list)
+    {
+        tmp = list_entry(pos,TS_PMT_Stream, list);
+
+        if(tmp->program_number == programNumber)
+        {
+            free(freetmp);
+            return 0;
+        }
+    }
 
     //section_length + 2 --> pmt start.  -4 --> CRC
     for ( ; pos_offset <= (psiPMT->section_length + 2 ) - 4; pos_offset += 5 )  
@@ -127,8 +147,8 @@ int parse_pmt_table_onesection(unsigned char * pBuffer, TS_PMT_TABLE * psiPMT, u
         tmp->ES_info_length =   (buffer[pos_offset+3] & 0x0F) << 8 | buffer[pos_offset+4];  
         tmp->program_number = programNumber;
 
-        //list_add(&(tmp->list), &(__ts_pmt_stream_list.list));
-        list_add(&(tmp->list), &(psiPMT->this_section_pmt_stream_head.list));
+        list_add(&(tmp->list), &(__ts_pmt_stream_list.list));
+        list_add(&(tmp->program_list), &(psiPMT->this_section_pmt_stream_head.program_list));
 
         if (tmp->ES_info_length != 0)  
             pos_offset += tmp->ES_info_length;    
@@ -177,9 +197,9 @@ int show_pmt_stream_info_onesection(TS_PMT_TABLE * pmtTable)
     int mediaType = -1;
     char * mediaTypeString[3] = {"Unknown","Video","Audio"};
     
-    list_for_each(pos, &(pmtTable->this_section_pmt_stream_head.list))
+    list_for_each(pos, &(pmtTable->this_section_pmt_stream_head.program_list))
     {
-        tmp = list_entry(pos,TS_PMT_Stream, list);
+        tmp = list_entry(pos,TS_PMT_Stream, program_list);
         mediaType = judge_media_type(tmp);
         uprintf("-------------------------------------------\n");
         uprintf("the program_number is 0x%X(%d)\n",tmp->program_number,tmp->program_number);
@@ -225,7 +245,30 @@ int show_pmt_table_info_one_program(TS_PMT_TABLE * pmtTable)
 
 
 
+int show_pmt_stream_info(void)
+{
+    struct list_head *pos;
+    P_TS_PMT_Stream tmp = (P_TS_PMT_Stream)malloc(sizeof(TS_PMT_Stream));
+    P_TS_PMT_Stream pFreetmp = tmp;
+    int mediaType = -1;
+    char * mediaTypeString[3] = {"Unknown","Video","Audio"};
+    
+    list_for_each(pos, &__ts_pmt_stream_list.list)
+    {
+        tmp = list_entry(pos,TS_PMT_Stream, list);
+        mediaType = judge_media_type(tmp);
 
+        uprintf("-------------------------------------------\n");
+        uprintf("the program_number is 0x%X(%d)\n",tmp->program_number,tmp->program_number);
+        uprintf("the stream_type is    0x%X(%d)(%s)\n",tmp->stream_type,tmp->stream_type, mediaTypeString[mediaType]);
+        uprintf("the elementary_PID is 0x%X,(%d)\n",tmp->elementary_PID, tmp->elementary_PID);
+        uprintf("-------------------------------------------\n");
+    }
+
+    free(pFreetmp);
+
+    return 0;
+}
 
 
 
@@ -242,14 +285,6 @@ int show_pmt_table_info_one_program(TS_PMT_TABLE * pmtTable)
 
 
 #if 0
-/*  
- *  Function    : Init the global pat_program_list and pmt_stream list
- */
-void init_ts_pmt_stream_list(void)
-{
-    INIT_LIST_HEAD(&__ts_pmt_stream_list.list);
-}
-
 int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength)
 {
     struct list_head *pos;

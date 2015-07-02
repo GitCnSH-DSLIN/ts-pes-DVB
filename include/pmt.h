@@ -21,7 +21,8 @@ typedef struct ts_pmt_stream
 	unsigned reserved_6 : 4;
 	unsigned ES_info_length : 12; 
     
-    struct list_head list;
+    struct list_head program_list;//list_head for one section.
+    struct list_head list;//mount on global ts_pmt_stream_list.
     unsigned int program_number;
 }TS_PMT_Stream,* P_TS_PMT_Stream;
 
@@ -70,6 +71,8 @@ typedef struct ts_pmt_table
                                                         ((b[offset + len - 1] & 0xFF)); \
                                                     })
 
+TS_PMT_Stream  __ts_pmt_stream_list;
+void init_ts_pmt_stream_list(void);
 
 
 int parse_pmt_table_one_program(FILE *pFile, unsigned int packetLength,
@@ -79,7 +82,6 @@ int judge_media_type(P_TS_PMT_Stream ptsPmtStream);
 int show_pmt_stream_info_onesection(TS_PMT_TABLE * pmtTable);
 int show_pmt_table_info_one_program(TS_PMT_TABLE * pmtTable);
 
-//TS_PMT_Stream  __ts_pmt_stream_list;
 //int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength);
 
 

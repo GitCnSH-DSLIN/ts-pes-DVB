@@ -14,11 +14,12 @@ typedef struct ts_pat_program
     unsigned reseved_1 : 3;
     unsigned program_map_pid : 13;
     //TS_PMT_Stream pmt_stream_info;
-    struct list_head list;
+    struct list_head section_list;//list for one section
+    struct list_head list;//global list __ts_pat_program_list
 }TS_PAT_Program, *P_TS_PAT_Program;
 
 
-//TS_PAT_Program __ts_pat_program_list;
+TS_PAT_Program __ts_pat_program_list;
 
 //PAT --  Program Association Table
 typedef struct ts_pat_table
@@ -68,5 +69,6 @@ int parse_pat_table_onesection(unsigned char * pBuffer,TS_PAT_TABLE * psiPAT);
 int show_pat_program_info_onesection(TS_PAT_TABLE * patTable);
 int show_pat_table_info(TS_PAT_TABLE * patTable);
 void free_pat_table(TS_PAT_TABLE * pat_table_header);
-//void init_ts_pat_program_list(void);
-//int show_pat_program_info(void);
+
+void init_ts_pat_program_list(void);
+int show_pat_program_info(void);

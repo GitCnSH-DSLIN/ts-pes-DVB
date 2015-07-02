@@ -15,6 +15,13 @@
 #include <print_debug.h>
 
 
+/*  
+ *  Function    : Init the global pat_program_list and pmt_stream list
+ */
+void init_ts_pat_program_list(void)
+{
+    INIT_LIST_HEAD(&__ts_pat_program_list.list);
+}
 
 TS_PAT_TABLE * parse_pat_table(FILE *pFile, unsigned int packetLength)
 {
@@ -95,7 +102,7 @@ int parse_pat_table_onesection(unsigned char * pBuffer,TS_PAT_TABLE * psiPAT)
     // and the len length is the total length of buffer. 
     psiPAT->CRC_32                      = PAT_CAC32(buffer,offset); 
     
-    INIT_LIST_HEAD(&(psiPAT->this_section_program_head.list));
+    INIT_LIST_HEAD(&(psiPAT->this_section_program_head.section_list));
     //psiPAT->pat_next_section = NULL;
 
     //Parse the PAT_Program_
@@ -120,8 +127,8 @@ int parse_pat_table_onesection(unsigned char * pBuffer,TS_PAT_TABLE * psiPAT)
             tmp = (P_TS_PAT_Program)malloc(sizeof(TS_PAT_Program));
             tmp->program_number = program_num;
             tmp->program_map_pid = (buffer[10 + n] & 0x1F) << 8| buffer[11 + n];
-            //list_add(&(tmp->list), &(__ts_pat_program_list.list));
-            list_add(&(tmp->list), &(psiPAT->this_section_program_head.list));
+            list_add(&(tmp->list), &(__ts_pat_program_list.list));
+            list_add(&(tmp->section_list), &(psiPAT->this_section_program_head.section_list));
         }
     }
 
@@ -138,9 +145,9 @@ int show_pat_program_info_onesection(TS_PAT_TABLE * patTable)
     P_TS_PAT_Program tmp = (P_TS_PAT_Program)malloc(sizeof(TS_PAT_Program));
     P_TS_PAT_Program pFreetmp = tmp;
 
-    list_for_each(pos, &(patTable->this_section_program_head.list))
+    list_for_each(pos, &(patTable->this_section_program_head.section_list))
     {
-        tmp = list_entry(pos,TS_PAT_Program, list);
+        tmp = list_entry(pos,TS_PAT_Program, section_list);
         uprintf("-------------------------------------------\n");
         uprintf("the program_num is  0x%X(%d)\n",tmp->program_number, tmp->program_number);
         uprintf("the program_map_pid 0x%X(%d)\n",tmp->program_map_pid, tmp->program_map_pid);
@@ -185,9 +192,9 @@ void free_pat_program_info_onesection(TS_PAT_TABLE * pat_table)
     P_TS_PAT_Program pFreetmp = tmp;
 
     //list_for_each_safe(pos, n, &(pat_table->this_section_program_head.list));
-    list_for_each(pos, &(pat_table->this_section_program_head.list))
+    list_for_each(pos, &(pat_table->this_section_program_head.section_list))
     {
-        tmp = list_entry(pos,TS_PAT_Program, list);
+        tmp = list_entry(pos,TS_PAT_Program, section_list);
         free(tmp);
     }
 
@@ -214,17 +221,7 @@ void free_pat_table(TS_PAT_TABLE * pat_table_header)
 
 
 
-#if 0
-/*  
- *  Function    : Init the global pat_program_list and pmt_stream list
- */
-void init_ts_pat_program_list(void)
-{
-    INIT_LIST_HEAD(&__ts_pat_program_list.list);
-}
-#endif
 
-#if 0
 int show_pat_program_info(void)
 {
     struct list_head *pos;
@@ -244,5 +241,4 @@ int show_pat_program_info(void)
     
     return 0;
 }
-#endif
 
