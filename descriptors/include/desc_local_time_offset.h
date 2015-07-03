@@ -26,7 +26,7 @@ typedef struct local_time_offset_desc{
 	unsigned char descriptor_tag;
 	unsigned char descriptor_length;
 
-    struct sdt_descriptor_common * next_desc;
+    struct descriptor_common * next_desc;
     struct local_time_offset_item * first_item;
 }LOCAL_TIME_OFFSET_DESC,*P_LOCAL_TIME_OFFSET_DESC;
 
@@ -48,17 +48,17 @@ LOCAL_TIME_OFFSET_ITEM * insert_localtime_offset_item_node(LOCAL_TIME_OFFSET_ITE
 
 void decode_localtime_offset_item(unsigned char* byteptr, LOCAL_TIME_OFFSET_ITEM * item_localtime);
 
-SDT_DESCRIPTOR_COMMON * decode_local_time_offset_desc(unsigned char* byteptr, int this_section_length);
+DESCRIPTOR_COMMON * decode_local_time_offset_desc(unsigned char* byteptr, int this_section_length);
 
 
 void free_localtime_offset_item(LOCAL_TIME_OFFSET_ITEM *pheader);
 
-void free_local_time_offset_desc(SDT_DESCRIPTOR_COMMON *head);
+void free_local_time_offset_desc(DESCRIPTOR_COMMON *head);
 
 
 void show_localtime_offset_item(LOCAL_TIME_OFFSET_ITEM *head);
 
-void show_local_time_offset_descriptor(SDT_DESCRIPTOR_COMMON *ptmp);
+void show_local_time_offset_descriptor(DESCRIPTOR_COMMON *ptmp);
 
 #endif /* _DESC_LOCAL_TIME_OFFSET_H_ */
 

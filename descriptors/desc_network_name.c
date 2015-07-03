@@ -9,11 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sdt.h>
-#include <sdt_descriptor.h>
+#include <descriptor_common.h>
 #include <desc_network_name.h>
 #include <print_debug.h>
 
-SDT_DESCRIPTOR_COMMON * decode_network_name_desc(unsigned char * byteptr, int this_section_length)
+DESCRIPTOR_COMMON * decode_network_name_desc(unsigned char * byteptr, int this_section_length)
 {
 	unsigned char* b = byteptr;
 
@@ -26,10 +26,10 @@ SDT_DESCRIPTOR_COMMON * decode_network_name_desc(unsigned char * byteptr, int th
 	desc_network_name->network_name = (char*)calloc(desc_network_name->descriptor_length + 1, sizeof(char));
 	strncpy(desc_network_name->network_name, (char*)&b[2], desc_network_name->descriptor_length);
 	
-    return (SDT_DESCRIPTOR_COMMON *)desc_network_name; 
+    return (DESCRIPTOR_COMMON *)desc_network_name; 
 }
 
-void free_network_name_desc(SDT_DESCRIPTOR_COMMON* head)
+void free_network_name_desc(DESCRIPTOR_COMMON* head)
 {
 	NETWORK_NAME_DESC * phead = (NETWORK_NAME_DESC *)head;
     free(phead->network_name);
@@ -43,7 +43,7 @@ void free_network_name_desc(SDT_DESCRIPTOR_COMMON* head)
     head  = NULL;
 }
 
-void show_network_name_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
+void show_network_name_descriptor(DESCRIPTOR_COMMON *ptmp)
 {
     NETWORK_NAME_DESC * tmp = (NETWORK_NAME_DESC*)ptmp;
 	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);

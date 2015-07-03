@@ -9,11 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sdt.h>
-#include <sdt_descriptor.h>
+#include <descriptor_common.h>
 #include <desc_service_list.h>
 #include <print_debug.h>
 
-SDT_DESCRIPTOR_COMMON * decode_service_list_desc(unsigned char* byteptr, int this_section_length)
+DESCRIPTOR_COMMON * decode_service_list_desc(unsigned char* byteptr, int this_section_length)
 {
 	unsigned char* b = byteptr;
 
@@ -35,7 +35,7 @@ SDT_DESCRIPTOR_COMMON * decode_service_list_desc(unsigned char* byteptr, int thi
 		len -= 3;
 	}
 
-	return (SDT_DESCRIPTOR_COMMON *)desc_servicelist;
+	return (DESCRIPTOR_COMMON *)desc_servicelist;
 }
 
 int decode_servicelist_item(unsigned char* byteptr, int this_section_length,SERIVCE_LIST_DESC_ITEM* item_servicelist){
@@ -51,7 +51,7 @@ int decode_servicelist_item(unsigned char* byteptr, int this_section_length,SERI
 	return l;
 }
 
-void free_service_list_desc(SDT_DESCRIPTOR_COMMON *head)
+void free_service_list_desc(DESCRIPTOR_COMMON *head)
 {
 	SERVICE_LIST_DESC *phead = (SERVICE_LIST_DESC *)head;
         
@@ -65,7 +65,7 @@ void free_service_list_desc(SDT_DESCRIPTOR_COMMON *head)
 
 
 
-void show_service_list_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
+void show_service_list_descriptor(DESCRIPTOR_COMMON *ptmp)
 {
     SERVICE_LIST_DESC * tmp = (SERVICE_LIST_DESC*)ptmp;
 	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);

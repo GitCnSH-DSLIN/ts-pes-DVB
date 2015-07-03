@@ -9,11 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sdt.h>
-#include <sdt_descriptor.h>
+#include <descriptor_common.h>
 #include <desc_short_event.h>
 #include <print_debug.h>
 
-SDT_DESCRIPTOR_COMMON * decode_short_event_desc(unsigned char* byteptr, int this_section_length)
+DESCRIPTOR_COMMON * decode_short_event_desc(unsigned char* byteptr, int this_section_length)
 {
 	unsigned char* b = byteptr;
 
@@ -38,10 +38,10 @@ SDT_DESCRIPTOR_COMMON * decode_short_event_desc(unsigned char* byteptr, int this
 	uprintf("desc_short_event->text_length:0x%x\n",desc_short_event->text_length);
 	uprintf("desc_short_event->text:%s\n",desc_short_event->text);
 #endif
-	return (SDT_DESCRIPTOR_COMMON *)desc_short_event;
+	return (DESCRIPTOR_COMMON *)desc_short_event;
 }
 
-void free_short_event_desc(SDT_DESCRIPTOR_COMMON* head)
+void free_short_event_desc(DESCRIPTOR_COMMON* head)
 {
 	SHORT_EVENT_DESC * phead = (SHORT_EVENT_DESC *)head;
     
@@ -58,7 +58,7 @@ void free_short_event_desc(SDT_DESCRIPTOR_COMMON* head)
     head = NULL;
 }
 
-void show_short_event_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
+void show_short_event_descriptor(DESCRIPTOR_COMMON *ptmp)
 {
     SHORT_EVENT_DESC * tmp = (SHORT_EVENT_DESC*)ptmp;
 	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);

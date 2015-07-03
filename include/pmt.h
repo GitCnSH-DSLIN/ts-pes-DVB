@@ -1,15 +1,17 @@
 /*********************************************************************
 *
-* Filename      :   ts_psi.h
-* Description   :   given the fundamental struction of psi protocol of DVB
+* Filename      :   pmt.h
+* Description   :   
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/
-//#include <ts_list.h>
 
-//#ifndef	_MPEG_TS_H_
-//#define	_MPEG_TS_H_
-#include <sdt.h>
+#ifndef  _MPEG_TS_SI_PMT_H_
+#define  _MPEG_TS_SI_PMT_H_
+
+#include <ts_list.h>
+#include <descriptor_common.h>
+
 
 #define TABLE_ID_TS_PMT         (0x02)
 
@@ -46,7 +48,7 @@ typedef struct ts_pmt_table
 	unsigned reserved_4 : 4;
 	unsigned program_info_length : 12;	//bytes number
 
-    SDT_DESCRIPTOR_COMMON * first_desc;
+    DESCRIPTOR_COMMON * first_desc;
 
     struct ts_pmt_stream this_section_pmt_stream_head;
     struct ts_pmt_table * pmt_next_section;
@@ -89,4 +91,4 @@ int show_pmt_table_info_one_program(TS_PMT_TABLE * pmtTable);
 int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength);
 
 
-//#endif	//_MPEG_TS_H_
+#endif

@@ -15,7 +15,7 @@
 typedef struct component_descriptor{
     unsigned char descriptor_tag;
     unsigned char descriptor_length;
-    struct sdt_descriptor_common * next_desc;//add by myself
+    struct descriptor_common * next_desc;//add by myself
     unsigned reserved_future_use : 4;
     unsigned stream_content : 4;
     unsigned component_type : 8;
@@ -37,11 +37,11 @@ typedef struct component_descriptor{
 
 
 
-SDT_DESCRIPTOR_COMMON * decode_component_desc(unsigned char* byteptr, int this_section_length);
+DESCRIPTOR_COMMON * decode_component_desc(unsigned char* byteptr, int this_section_length);
 
-void free_component_desc(SDT_DESCRIPTOR_COMMON * head);
+void free_component_desc(DESCRIPTOR_COMMON * head);
 
-void show_component_descriptor(SDT_DESCRIPTOR_COMMON *ptmp);
+void show_component_descriptor(DESCRIPTOR_COMMON *ptmp);
 
 #endif
 

@@ -8,24 +8,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-//#include <sdt_descriptor.h>
 #include <print_debug.h>
-#include <sdt.h>
 #include <descriptors.h>
 
-SDT_DESCRIPTOR_COMMON * decode_default(unsigned char * byteptr, int this_section_length)
+DESCRIPTOR_COMMON * decode_default(unsigned char * byteptr, int this_section_length)
 {
     unsigned char * b = byteptr;
 
-    SDT_DESCRIPTOR_COMMON *desc_default = (SDT_DESCRIPTOR_COMMON *)malloc(sizeof(SDT_DESCRIPTOR_COMMON));
-    memset(desc_default, '\0', sizeof(SDT_DESCRIPTOR_COMMON));
+    DESCRIPTOR_COMMON *desc_default = (DESCRIPTOR_COMMON *)malloc(sizeof(DESCRIPTOR_COMMON));
+    memset(desc_default, '\0', sizeof(DESCRIPTOR_COMMON));
     desc_default->descriptor_tag = b[0];
     desc_default->descriptor_length = b[1];
     
     return desc_default;
 }
 
-SDT_DESCRIPTOR_COMMON * (*do_decode_desc[64])(unsigned char * byteptr, int this_section_length) = {
+DESCRIPTOR_COMMON * (*do_decode_desc[64])(unsigned char * byteptr, int this_section_length) = {
     /*decode for each descriptors*/
     decode_network_name_desc,                       //0x40
     decode_service_list_desc,                       //0x41
@@ -96,13 +94,13 @@ SDT_DESCRIPTOR_COMMON * (*do_decode_desc[64])(unsigned char * byteptr, int this_
 
 
 
-SDT_DESCRIPTOR_COMMON * decode_desc(unsigned char * byteptr, int this_section_length)
+DESCRIPTOR_COMMON * decode_desc(unsigned char * byteptr, int this_section_length)
 {
     unsigned char descriptor_tag = byteptr[0];
     unsigned char * b = byteptr;
     int l = this_section_length;
     unsigned int desc_len = 0;
-    SDT_DESCRIPTOR_COMMON * this_descriptor = NULL;
+    DESCRIPTOR_COMMON * this_descriptor = NULL;
 
     if(descriptor_tag > 0x7F && descriptor_tag < 0xFF )
     {
@@ -132,7 +130,7 @@ SDT_DESCRIPTOR_COMMON * decode_desc(unsigned char * byteptr, int this_section_le
 }
 
 
-void free_desc_default(SDT_DESCRIPTOR_COMMON* head)
+void free_desc_default(DESCRIPTOR_COMMON* head)
 {
     //uprintf("prepare to free : 0x%x\n",head->descriptor_tag);
     free_desc(head->next_desc);
@@ -143,7 +141,7 @@ void free_desc_default(SDT_DESCRIPTOR_COMMON* head)
 }
 
 
-void (*do_free_descriptors[64])(SDT_DESCRIPTOR_COMMON *ptmp) = {
+void (*do_free_descriptors[64])(DESCRIPTOR_COMMON *ptmp) = {
     /*free descriptor for each different descriptors*/
     free_network_name_desc,                 //0x40
     free_service_list_desc,                 //0x41
@@ -212,7 +210,7 @@ void (*do_free_descriptors[64])(SDT_DESCRIPTOR_COMMON *ptmp) = {
 };
 
 
-void free_desc(SDT_DESCRIPTOR_COMMON *phead)
+void free_desc(DESCRIPTOR_COMMON *phead)
 {
     if (NULL == phead)
     {
@@ -240,16 +238,16 @@ void free_desc(SDT_DESCRIPTOR_COMMON *phead)
 
 
 
-void show_desc_default(SDT_DESCRIPTOR_COMMON *ptmp)
+void show_desc_default(DESCRIPTOR_COMMON *ptmp)
 {
-    SDT_DESCRIPTOR_COMMON * tmp = ptmp;
+    DESCRIPTOR_COMMON * tmp = ptmp;
 	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);
 	uprintf("\t\tdescriptor_name    :   user defined descriptor(unknown)\n");
 	uprintf("\t\tdescriptor_length  :   0x%x\n\n",tmp->descriptor_length);
 }
 
 
-void (*do_show_descriptors_info[64])(SDT_DESCRIPTOR_COMMON *ptmp) = {
+void (*do_show_descriptors_info[64])(DESCRIPTOR_COMMON *ptmp) = {
     /*show info for each descriptors*/
     show_network_name_descriptor,               //0x40
     show_service_list_descriptor,               //0x41
@@ -318,17 +316,15 @@ void (*do_show_descriptors_info[64])(SDT_DESCRIPTOR_COMMON *ptmp) = {
 };
 
 
-void show_sdt_service_descriptors_info(SDT_SERVICE * sdtService)
+void show_desc(DESCRIPTOR_COMMON *phead)
 {
-	SDT_DESCRIPTOR_COMMON *HeaderDesc = (SDT_DESCRIPTOR_COMMON *)sdtService->first_desc;
-    SDT_DESCRIPTOR_COMMON *ptmp = HeaderDesc;
+	DESCRIPTOR_COMMON *HeaderDesc = phead;
+    DESCRIPTOR_COMMON *ptmp = HeaderDesc;
     unsigned char descriptor_tag;
-    unsigned char descriptor_length;
 
     while (NULL != ptmp)
     {
         descriptor_tag = ptmp->descriptor_tag;
-        descriptor_length = ptmp->descriptor_length;
         
         if(descriptor_tag > 0x7F && descriptor_tag < 0xFF )
         {
@@ -346,8 +342,9 @@ void show_sdt_service_descriptors_info(SDT_SERVICE * sdtService)
     
         }
         
-        ptmp = (SDT_DESCRIPTOR_COMMON *)ptmp->next_desc;
+        ptmp = (DESCRIPTOR_COMMON *)ptmp->next_desc;
     }
 }
+
 
 

@@ -32,9 +32,9 @@ typedef struct short_event_desc{
 											b[base]; \
 										})
 
-SDT_DESCRIPTOR_COMMON * decode_short_event_desc(unsigned char* byteptr, int this_section_length);
-void free_short_event_desc(SDT_DESCRIPTOR_COMMON* head);
+DESCRIPTOR_COMMON * decode_short_event_desc(unsigned char* byteptr, int this_section_length);
+void free_short_event_desc(DESCRIPTOR_COMMON* head);
 
-void show_short_event_descriptor(SDT_DESCRIPTOR_COMMON *ptmp);
+void show_short_event_descriptor(DESCRIPTOR_COMMON *ptmp);
 
 #endif /* _DESC_SHORT_EVENT_H_ */

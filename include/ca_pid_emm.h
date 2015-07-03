@@ -5,6 +5,10 @@
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/
+#ifndef  _MPEG_TS_SI_CA_PID_EMM_H_
+#define  _MPEG_TS_SI_CA_PID_EMM_H_
+
+
 #include <tslib.h>
 
 
@@ -66,3 +70,5 @@ int store_one_packet_data(CA_PID_EMM * caPidEmmHeader, unsigned char *tmpbuffer,
 
 int load_ca_pid_emm(FILE *pFile, unsigned int CA_PID,
         CA_PID_EMM * caPidEmmHeader, unsigned int packetLength);
+
+#endif

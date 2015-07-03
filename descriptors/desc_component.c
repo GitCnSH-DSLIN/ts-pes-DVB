@@ -9,11 +9,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sdt.h>
-#include <sdt_descriptor.h>
+#include <descriptor_common.h>
 #include <desc_component.h>
 #include <print_debug.h>
 
-SDT_DESCRIPTOR_COMMON * decode_component_desc(unsigned char * byteptr, int this_section_length)
+DESCRIPTOR_COMMON * decode_component_desc(unsigned char * byteptr, int this_section_length)
 {
 	unsigned char* b = byteptr;
 
@@ -29,10 +29,10 @@ SDT_DESCRIPTOR_COMMON * decode_component_desc(unsigned char * byteptr, int this_
 	desc_component->text_char = (char*)calloc(desc_component->descriptor_length - 6 + 1, sizeof(char));
 	strncpy(desc_component->text_char, (char*)&b[8], desc_component->descriptor_length - 6);
 	
-    return (SDT_DESCRIPTOR_COMMON *)desc_component; 
+    return (DESCRIPTOR_COMMON *)desc_component; 
 }
 
-void free_component_desc(SDT_DESCRIPTOR_COMMON* head)
+void free_component_desc(DESCRIPTOR_COMMON* head)
 {
 	COMPONENT_DESC * phead = (COMPONENT_DESC *)head;
     free(phead->text_char);
@@ -46,7 +46,7 @@ void free_component_desc(SDT_DESCRIPTOR_COMMON* head)
     head  = NULL;
 }
 
-void show_component_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
+void show_component_descriptor(DESCRIPTOR_COMMON *ptmp)
 {
     COMPONENT_DESC * tmp = (COMPONENT_DESC*)ptmp;
 	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);

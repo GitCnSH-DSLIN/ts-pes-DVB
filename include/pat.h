@@ -5,6 +5,10 @@
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/
+#ifndef  _MPEG_TS_SI_PAT_H_
+#define  _MPEG_TS_SI_PAT_H_
+
+
 #define PID_TS_PAT          (0x00)
 #define TABLE_ID_TS_PAT     (0x00)
 
@@ -73,3 +77,5 @@ void free_pat_table(TS_PAT_TABLE * pat_table_header);
 void init_ts_pat_program_list(void);
 int show_pat_program_info(void);
 int search_given_program_info(unsigned int searchProgramId);
+
+#endif

@@ -11,7 +11,7 @@
 #include <print_debug.h>
 #include <sdt.h>
 #include <tslib.h>
-#include <sdt_descriptor.h>
+#include <descriptor_common.h>
 P_SDT_SERVICE insert_sdt_service_node(SDT_SERVICE * Header, SDT_SERVICE * node)
 {
     SDT_SERVICE * ptmp = Header;
@@ -200,6 +200,16 @@ int show_sdt_table_info(TS_SDT_TABLE * pSdtTable)
         ptmp = (unsigned int *)tmp;
     }
 }
+
+
+
+void show_sdt_service_descriptors_info(SDT_SERVICE * sdtService)
+{
+    DESCRIPTOR_COMMON *head = sdtService->first_desc;
+    
+    show_desc(head); 
+}
+
 
 
 

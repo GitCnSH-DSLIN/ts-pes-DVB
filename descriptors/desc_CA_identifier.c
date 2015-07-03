@@ -10,11 +10,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sdt.h>
-#include <sdt_descriptor.h>
+#include <descriptor_common.h>
 #include <print_debug.h>
 #include <desc_CA_identifier.h>
 
-SDT_DESCRIPTOR_COMMON * decode_CA_identifier_desc(unsigned char* byteptr, int this_section_length)
+DESCRIPTOR_COMMON * decode_CA_identifier_desc(unsigned char* byteptr, int this_section_length)
 {
 	unsigned char* b = byteptr;
 	
@@ -29,11 +29,11 @@ SDT_DESCRIPTOR_COMMON * decode_CA_identifier_desc(unsigned char* byteptr, int th
 
 	memcpy(pCA, &b[2], caIdentifierDesc->descriptor_length);
 
-	return  (SDT_DESCRIPTOR_COMMON *)caIdentifierDesc;
+	return  (DESCRIPTOR_COMMON *)caIdentifierDesc;
 }
 
 
-void free_CA_identifier_desc(SDT_DESCRIPTOR_COMMON *head)
+void free_CA_identifier_desc(DESCRIPTOR_COMMON *head)
 {
     CA_IDENTIFIER_DESC * phead = (CA_IDENTIFIER_DESC *)head;
 
@@ -50,7 +50,7 @@ void free_CA_identifier_desc(SDT_DESCRIPTOR_COMMON *head)
 }
 
 
-void show_CA_identifier_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
+void show_CA_identifier_descriptor(DESCRIPTOR_COMMON *ptmp)
 {
     CA_IDENTIFIER_DESC * tmp = (CA_IDENTIFIER_DESC *)ptmp;
 	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);

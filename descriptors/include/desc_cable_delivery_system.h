@@ -13,7 +13,7 @@
 typedef struct cable_delivery_system_desc{
     unsigned char descriptor_tag;
     unsigned char descriptor_length;
-    struct sdt_descriptor_common * next_desc; //add by myself
+    struct descriptor_common * next_desc; //add by myself
     unsigned int  frequency;
     unsigned reserved_future_use : 12;
     unsigned FEC_outer : 4;
@@ -32,11 +32,11 @@ typedef struct cable_delivery_system_desc{
                                                             (b[11] << 4) | (b[12] & 0xf0) >> 4)
 #define CABLE_DELIVERY_SYSTEM_DESC_FEC_INNER(b)         (b[12] & 0x0f)
 
-SDT_DESCRIPTOR_COMMON * decode_cable_delivery_system_desc(unsigned char* byteptr, int this_section_length);
+DESCRIPTOR_COMMON * decode_cable_delivery_system_desc(unsigned char* byteptr, int this_section_length);
 
-void free_cable_delivery_system_desc(SDT_DESCRIPTOR_COMMON * head);
+void free_cable_delivery_system_desc(DESCRIPTOR_COMMON * head);
 
-void show_cable_delivery_system_descriptor(SDT_DESCRIPTOR_COMMON *ptmp);
+void show_cable_delivery_system_descriptor(DESCRIPTOR_COMMON *ptmp);
 
 #endif /* _DESC_SERVICE_H_ */
 

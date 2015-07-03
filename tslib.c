@@ -195,14 +195,14 @@ int store_one_section_data(FILE *pFile, unsigned int mPacketLength, TABLE_SECTIO
                             {
                                 memcpy(pbuffer_index, ptsbuffer + offset_length, buffer_size);
                                 pbuffer_index += buffer_size;
-                                uprintf("the offset_length is %d and copy_count is %d\n",offset_length,copy_count);
-                                show_packet_memory(ptsbuffer, buffer_size);
+                          //      uprintf("the offset_length is %d and copy_count is %d\n",offset_length,copy_count);
+                          //      show_packet_memory(ptsbuffer, buffer_size);
                             }
                             else
                             {
                                 memcpy(pbuffer_index, ptsbuffer + offset_length, mPacketLength-offset_length);
-                                uprintf("the offset_length is %d and copy_count is %d\n",offset_length,copy_count);
-                                show_packet_memory(ptsbuffer, mPacketLength);
+                            //    uprintf("the offset_length is %d and copy_count is %d\n",offset_length,copy_count);
+                            //    show_packet_memory(ptsbuffer, mPacketLength);
                                 pbuffer_index += mPacketLength - offset_length;
                                 buffer_size   -= (mPacketLength - offset_length);
                             }
@@ -304,7 +304,7 @@ TABLE_SECTION_LIST * table_section_list_add(TABLE_SECTION_LIST *head, TABLE_SECT
                     p_section_head = alloc_and_init_table_section(tmp_ts_buffer, i, offset_length);
                     store_one_section_data(pFile, mPacketLength, p_section_head);
 
-                    show_packet_memory(p_section_head->pbuffer,p_section_head->buffer_size);
+                    //show_packet_memory(p_section_head->pbuffer,p_section_head->buffer_size);
                 }
                 else
                 {
