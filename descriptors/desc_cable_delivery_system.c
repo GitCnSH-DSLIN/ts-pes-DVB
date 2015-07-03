@@ -64,5 +64,5 @@ void show_cable_delivery_system_descriptor(DESCRIPTOR_COMMON *ptmp)
  	uprintf("\t\tFEC_outer          :   0x%x\n",tmp->FEC_outer);
  	uprintf("\t\tmodulation         :   0x%x\n",tmp->modulation);
  	uprintf("\t\tsymbol_rate        :   0x%x\n",tmp->symbol_rate);
- 	uprintf("\t\tFEC_inner          :   0x%x\n",tmp->FEC_inner);
+ 	uprintf("\t\tFEC_inner          :   0x%x\n\n",tmp->FEC_inner);
 }

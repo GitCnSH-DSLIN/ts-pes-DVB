@@ -63,5 +63,5 @@ void show_short_event_descriptor(DESCRIPTOR_COMMON *ptmp)
     SHORT_EVENT_DESC * tmp = (SHORT_EVENT_DESC*)ptmp;
 	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);
 	uprintf("\t\tdescriptor_name    :   network_name_descriptor\n");
-	uprintf("\t\tdescriptor_length  :   0x%x\n",tmp->descriptor_length);
+	uprintf("\t\tdescriptor_length  :   0x%x\n\n",tmp->descriptor_length);
 }

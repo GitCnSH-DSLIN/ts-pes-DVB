@@ -70,5 +70,5 @@ void show_service_list_descriptor(DESCRIPTOR_COMMON *ptmp)
     SERVICE_LIST_DESC * tmp = (SERVICE_LIST_DESC*)ptmp;
 	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);
 	uprintf("\t\tdescriptor_name    :   service_list_descriptor\n");
-	uprintf("\t\tdescriptor_length  :   0x%x\n",tmp->descriptor_length);
+	uprintf("\t\tdescriptor_length  :   0x%x\n\n",tmp->descriptor_length);
 }

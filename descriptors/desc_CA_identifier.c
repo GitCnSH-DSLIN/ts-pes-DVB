@@ -68,5 +68,5 @@ void show_CA_identifier_descriptor(DESCRIPTOR_COMMON *ptmp)
         if((index + 1)%16 == 0)
             uprintf("\n");
     }
-    uprintf("\n");
+    uprintf("\n\n");
 }

@@ -55,7 +55,7 @@ void show_component_descriptor(DESCRIPTOR_COMMON *ptmp)
 	uprintf("\t\tstream_content     :   0x%x(%d)\n",tmp->stream_content, tmp->stream_content);
 	uprintf("\t\tcomponent_type     :   0x%x(%d)\n",tmp->component_type, tmp->component_type);
 	uprintf("\t\tISO_639_langua_code:   0x%x(%d)\n",tmp->ISO_639_language_code, tmp->ISO_639_language_code);
-	uprintf("\t\ttext_char          :   %s\n",tmp->text_char);
+	uprintf("\t\ttext_char          :   %s\n\n",tmp->text_char);
 }
 
 

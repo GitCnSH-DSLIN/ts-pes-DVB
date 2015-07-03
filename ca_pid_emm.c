@@ -49,6 +49,8 @@ CA_PID_EMM *ca_pid_add_list(CA_PID_EMM *Header, CA_PID_EMM *newNode)
     CA_PID_EMM * lastNode = ca_pid_list_lastnode(Header);
 
                  lastNode->next_section = newNode;
+
+                 return Header;
 }
 
 

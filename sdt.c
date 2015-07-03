@@ -51,6 +51,10 @@ int decode_sdt_service(unsigned char * byteptr, int this_section_length, SDT_SER
     {
 		psdtService->first_desc = decode_desc(serv_start,len);
 	}
+    else
+    {
+		psdtService->first_desc = NULL;
+    }
 
 	return (len + 5);
 }
@@ -130,6 +134,12 @@ TS_SDT_TABLE * parse_sdt_table_onesection(unsigned char *byteptr, TS_SDT_TABLE *
     SDT_SERVICE  * psdtServiceNode = NULL;
     int firstFlag = 1;
 
+    if(len <= 0)
+    {
+        pSdtTable->first_sdt_service = NULL;
+        return 0;
+    }
+
 	while(len > 0)
     {
         psdtServiceNode = (SDT_SERVICE *)malloc(sizeof(SDT_SERVICE));
@@ -199,6 +209,7 @@ int show_sdt_table_info(TS_SDT_TABLE * pSdtTable)
         //to judge if goto the end. last_8 byte.
         ptmp = (unsigned int *)tmp;
     }
+    return 0;
 }
 
 

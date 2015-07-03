@@ -179,6 +179,7 @@ int show_pat_table_info(TS_PAT_TABLE * patTable)
         //to jedge if goto the end. last_8 byte.
         ptmp = (unsigned int *)tmp;
     }
+    return 0;
 }
 
 

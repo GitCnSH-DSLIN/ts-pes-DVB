@@ -24,7 +24,6 @@ int store_pes_stream(FILE *pFile, FILE *storeFile,
     unsigned char * pFreetmpBuffer = tmpBuffer;
     unsigned int pes_start;
     unsigned int offsetLength = 0;
-    int ret;
         
     while((fread(tmpBuffer, ts_packet_length, 1, pFile) == 1))
     {
