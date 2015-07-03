@@ -124,8 +124,9 @@ void show_nit_transport_stream_info(TRANSPORT_STREAM * Header);
 int show_nit_table_info(TS_NIT_TABLE * pNitTable);
 void show_nit_descriptors_info(DESCRIPTOR_COMMON *header);
 void show_nit_transport_stream_descriptors_info(TRANSPORT_STREAM * nitTransStream);
-//void free_sdt_service(TS_SDT_TABLE * sdt);
-//void free_sdt_table(TS_SDT_TABLE * sdt_table_header);
+
+void free_transport_stream(TS_NIT_TABLE * nit);
+void free_nit_table(TS_NIT_TABLE * nit_table_header);
 
 /***************************** End of NIT releated struction **********************/
 

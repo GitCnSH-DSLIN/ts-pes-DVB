@@ -26,8 +26,8 @@ DESCRIPTOR_COMMON * decode_component_desc(unsigned char * byteptr, int this_sect
 	desc_component->component_type          = COMPONENT_DESC_COMPONENT_TYPE(b);
 	desc_component->ISO_639_language_code   = COMPONENT_DESC_ISO_639_LANGUAGE_CODE(b);
 
-	desc_component->text_char = (char*)calloc(desc_component->descriptor_length - 6 + 1, sizeof(char));
-	strncpy(desc_component->text_char, (char*)&b[8], desc_component->descriptor_length - 6);
+	desc_component->text_char = (unsigned char*)calloc(desc_component->descriptor_length - 6 + 1, sizeof(char));
+	strncpy(desc_component->text_char, (unsigned char*)&b[8], desc_component->descriptor_length - 6);
 	
     return (DESCRIPTOR_COMMON *)desc_component; 
 }

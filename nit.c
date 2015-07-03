@@ -243,45 +243,43 @@ int show_nit_table_info(TS_NIT_TABLE * pNitTable)
 
 
 
-#if 0
-void free_sdt_service(TS_SDT_TABLE * sdt)
+void free_transport_stream(TS_NIT_TABLE * nit)
 {
-	SDT_SERVICE *head = sdt->first_sdt_service;
-	SDT_SERVICE *temp;
+	TRANSPORT_STREAM *head = nit->first_transport_stream;
+	TRANSPORT_STREAM *temp;
 
 	while(head != NULL){
-        //free all of the descriptors of this sdtService.
+        //free all of the descriptors of this transport_stream.
 		free_desc(head->first_desc);
 
 		temp = head;
-		head = temp->next_sdt_service;
+		head = temp->next_transport_stream;
 
-        //free this sdtService struction.
-		temp->next_sdt_service = NULL;
+        //free this nit_transport_stream struction.
+		temp->next_transport_stream = NULL;
 		free(temp);
 	}
 
-	sdt->first_sdt_service = NULL;
+	nit->first_transport_stream = NULL;
 }
 
 
-void free_sdt_table(TS_SDT_TABLE * sdt_table_header)
+void free_nit_table(TS_NIT_TABLE * nit_table_header)
 {
-    TS_SDT_TABLE *tmp = sdt_table_header;
+    TS_NIT_TABLE *tmp = nit_table_header;
     
     unsigned int *ptmp = (unsigned int *)tmp;
 
     while(NULL != tmp && (ptmp[0] | ptmp[1]) != 0)
     {
-        free_sdt_service(tmp);
+        free_desc(tmp->nit_first_desc);
+
+        free_transport_stream(tmp);
         tmp++;
         //to jedge if goto the end. last_8 byte.
         ptmp = (unsigned int *)tmp;
     }
 
-    free(sdt_table_header);
-    sdt_table_header = NULL;
-    
+    free(nit_table_header);
 }
 
-#endif

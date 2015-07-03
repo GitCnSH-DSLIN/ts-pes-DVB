@@ -27,8 +27,8 @@ int main(int argc, char * argv[])
     TS_NIT_TABLE * nit_table_head = parse_nit_table(pFile, packetLength);
 
     show_nit_table_info(nit_table_head);
-    //free_sdt_table(sdt_table_head);
-    //sdt_table_head = NULL;
+    free_nit_table(nit_table_head);
+    nit_table_head = NULL;
     /**************************************************************************/
     
     fclose(pFile);
