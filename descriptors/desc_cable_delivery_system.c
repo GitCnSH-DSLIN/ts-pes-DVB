@@ -8,10 +8,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sdt.h>
+#include <descriptor_common.h>
 #include <desc_cable_delivery_system.h>
 #include <print_debug.h>
 
-SDT_DESCRIPTOR_COMMON * decode_cable_delivery_system_desc(unsigned char* byteptr, int this_section_length)
+DESCRIPTOR_COMMON * decode_cable_delivery_system_desc(unsigned char* byteptr, int this_section_length)
 {
 	unsigned char* b = byteptr;
 
@@ -35,11 +37,11 @@ SDT_DESCRIPTOR_COMMON * decode_cable_delivery_system_desc(unsigned char* byteptr
  	uprintf("desc_cable_delivery_system->symbol_rate        :   0x%x\n",desc_cable_delivery_system->symbol_rate);
  	uprintf("desc_cable_delivery_system->FEC_inner          :   0x%x\n",desc_cable_delivery_system->FEC_inner);
 #endif
-	return (SDT_DESCRIPTOR_COMMON *)desc_cable_delivery_system;
+	return (DESCRIPTOR_COMMON *)desc_cable_delivery_system;
 }
 
 
-void free_cable_delivery_system_desc(SDT_DESCRIPTOR_COMMON * head)
+void free_cable_delivery_system_desc(DESCRIPTOR_COMMON * head)
 {
 //    uprintf("prepare to free : 0x%x\n",head->descriptor_tag);
 	CABLE_DELIVERY_SYSTEM_DESC * phead = (CABLE_DELIVERY_SYSTEM_DESC *)head;
@@ -52,7 +54,7 @@ void free_cable_delivery_system_desc(SDT_DESCRIPTOR_COMMON * head)
 	head = NULL;
 }
 
-void show_cable_delivery_system_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
+void show_cable_delivery_system_descriptor(DESCRIPTOR_COMMON *ptmp)
 {
     CABLE_DELIVERY_SYSTEM_DESC * tmp = (CABLE_DELIVERY_SYSTEM_DESC*)ptmp;
  	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);
@@ -62,5 +64,5 @@ void show_cable_delivery_system_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
  	uprintf("\t\tFEC_outer          :   0x%x\n",tmp->FEC_outer);
  	uprintf("\t\tmodulation         :   0x%x\n",tmp->modulation);
  	uprintf("\t\tsymbol_rate        :   0x%x\n",tmp->symbol_rate);
- 	uprintf("\t\tFEC_inner          :   0x%x\n",tmp->FEC_inner);
+ 	uprintf("\t\tFEC_inner          :   0x%x\n\n",tmp->FEC_inner);
 }

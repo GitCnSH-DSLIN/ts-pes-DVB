@@ -8,11 +8,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sdt.h>
+#include <descriptor_common.h>
 #include <desc_service.h>
 #include <print_debug.h>
 
 
-SDT_DESCRIPTOR_COMMON * decode_service_desc(unsigned char* byteptr, int this_section_length)
+DESCRIPTOR_COMMON * decode_service_desc(unsigned char* byteptr, int this_section_length)
 {
 	unsigned char* b = byteptr;
 
@@ -38,11 +40,11 @@ SDT_DESCRIPTOR_COMMON * decode_service_desc(unsigned char* byteptr, int this_sec
  	uprintf("desc_service->service_name_length:0x%x\n",desc_service->service_name_length);
  	uprintf("desc_service->service_name:%s\n",desc_service->service_name);
 #endif
-	return (SDT_DESCRIPTOR_COMMON *)desc_service;
+	return (DESCRIPTOR_COMMON *)desc_service;
 }
 
 
-void free_service_desc(SDT_DESCRIPTOR_COMMON * head)
+void free_service_desc(DESCRIPTOR_COMMON * head)
 {
 //    uprintf("prepare to free : 0x%x\n",head->descriptor_tag);
 	SERVICE_DESC * phead = (SERVICE_DESC *)head;
@@ -60,7 +62,7 @@ void free_service_desc(SDT_DESCRIPTOR_COMMON * head)
 	head = NULL;
 }
 
-void show_service_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
+void show_service_descriptor(DESCRIPTOR_COMMON *ptmp)
 {
     SERVICE_DESC * tmp = (SERVICE_DESC*)ptmp;
 	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);

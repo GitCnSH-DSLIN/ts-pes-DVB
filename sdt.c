@@ -10,8 +10,8 @@
 #include <string.h>
 #include <print_debug.h>
 #include <sdt.h>
-#include <ts_psi.h>
-#include <sdt_descriptor.h>
+#include <tslib.h>
+#include <descriptor_common.h>
 P_SDT_SERVICE insert_sdt_service_node(SDT_SERVICE * Header, SDT_SERVICE * node)
 {
     SDT_SERVICE * ptmp = Header;
@@ -51,17 +51,64 @@ int decode_sdt_service(unsigned char * byteptr, int this_section_length, SDT_SER
     {
 		psdtService->first_desc = decode_desc(serv_start,len);
 	}
+    else
+    {
+		psdtService->first_desc = NULL;
+    }
 
 	return (len + 5);
 }
 
-int parse_sdt_table(unsigned char * byteptr, int this_section_length, TS_SDT_TABLE * pSdtTable)
+
+
+TS_SDT_TABLE * parse_sdt_table(FILE *pFile, unsigned int packetLength)
+{
+    TABLE_SECTION_LIST * sdt_section = store_psi_si_table(pFile, packetLength, PID_TS_SI_SDT, TABLE_ID_SDT_OTHER);
+    TABLE_SECTION_LIST * sdt_section_index = sdt_section;
+    //the last 8 byte is the end flag
+    TS_SDT_TABLE * sdt_table_head = (TS_SDT_TABLE *)malloc(sizeof(TS_SDT_TABLE)*(sdt_section->last_section_number + 1) + 2*sizeof(int));
+    memset(sdt_table_head, 0, sizeof(TS_SDT_TABLE)*(sdt_section->last_section_number + 1) + 2*sizeof(int));
+
+    TS_SDT_TABLE * sdt_table_index = sdt_table_head;
+    unsigned int i=0;
+
+    while(NULL != sdt_section_index)
+    {
+        parse_sdt_table_onesection(sdt_section_index->pbuffer, sdt_table_index + i);
+        i++;
+        sdt_section_index = sdt_section_index->next_section;
+    }
+    
+    //free TABLE_SECTION_LIST
+    sdt_section_index = sdt_section;
+    TABLE_SECTION_LIST * next_sdt_section = NULL;
+    while(NULL != sdt_section_index)
+    {
+        next_sdt_section = sdt_section_index->next_section;
+
+        //free pbuffer
+        free(sdt_section_index->pbuffer);
+        sdt_section_index->pbuffer = NULL;
+
+        //free table_section
+        free(sdt_section_index);
+        sdt_section_index = NULL;
+    
+        sdt_section_index = next_sdt_section;
+    }
+    
+    //return the sdt list head
+    return sdt_table_head;
+}
+
+
+
+TS_SDT_TABLE * parse_sdt_table_onesection(unsigned char *byteptr, TS_SDT_TABLE * pSdtTable)
 {
     TS_PACKET_HEADER mtsPacketHeader;
-    unsigned int pes_start;
     parse_ts_packet_header(&mtsPacketHeader,byteptr);
 
-    unsigned int offset = locate_offset(&mtsPacketHeader, byteptr, 0, &pes_start);
+    unsigned int offset = locate_offset(&mtsPacketHeader, byteptr, PSI_SI_PACKET_FLAG, 0);
     unsigned char * b = byteptr + offset;
 
 	
@@ -79,14 +126,19 @@ int parse_sdt_table(unsigned char * byteptr, int this_section_length, TS_SDT_TAB
 	pSdtTable->original_network_id = SDT_ORIGINAL_NETWORK_ID(b);
 	pSdtTable->reserved_future_use_2 = SDT_RESERVED_FUTURE_USD_2(b);
 	pSdtTable->CRC_32 = SDT_CRC(b);
-
-
+        
     //12 = CRC4 + 8byte after section_length
     int len = pSdtTable->section_length - 12;
     unsigned char * serv_start = &b[11];
     int sdtServiceLength = 0;
     SDT_SERVICE  * psdtServiceNode = NULL;
     int firstFlag = 1;
+
+    if(len <= 0)
+    {
+        pSdtTable->first_sdt_service = NULL;
+        return 0;
+    }
 
 	while(len > 0)
     {
@@ -108,7 +160,7 @@ int parse_sdt_table(unsigned char * byteptr, int this_section_length, TS_SDT_TAB
    
     }
 
-    show_sdt_table_info(pSdtTable);
+    //show_sdt_table_info(pSdtTable);
 
     return 0;
 }
@@ -131,23 +183,45 @@ void show_sdt_service_info(SDT_SERVICE * Header)
     }
 }
 
-
-void show_sdt_table_info(TS_SDT_TABLE * pSdtTable)
+int show_sdt_table_info(TS_SDT_TABLE * pSdtTable)
 {
-	uprintf("SDT->table_id                :   0x%x\n",pSdtTable->table_id);
-	uprintf("SDT->section_syntax_indicator:   0x%x\n",pSdtTable->section_syntax_indicator);
-	uprintf("SDT->section_length          :   0x%x\n",pSdtTable->section_length);
-	uprintf("SDT->transport_stream_id     :   0x%x\n",pSdtTable->transport_stream_id);
-	uprintf("SDT->version_number          :   0x%x\n",pSdtTable->version_number);
-	uprintf("SDT->current_next_indicator  :   0x%x\n",pSdtTable->current_next_indicator);
-	uprintf("SDT->section_number          :   0x%x\n",pSdtTable->section_number);
-	uprintf("SDT->last_section_number     :   0x%x\n",pSdtTable->last_section_number);
-	uprintf("SDT->original_network_id     :   0x%x\n",pSdtTable->original_network_id);
-	uprintf("SDT->CRC_32                  :   0x%x\n",pSdtTable->CRC_32);
+    TS_SDT_TABLE *tmp = pSdtTable;
+    unsigned int *ptmp = (unsigned int *)tmp;
 
-    uprintf("\nFollowing information is the SDT Service Information.\n\n");
-    show_sdt_service_info(pSdtTable->first_sdt_service);
+    while(NULL != tmp && (ptmp[0] | ptmp[1]) != 0)
+    {
+    
+        uprintf("-------------------------------------------\n");
+	    uprintf("SDT->table_id                :   0x%x(%d)\n",tmp->table_id,tmp->table_id);
+	    uprintf("SDT->section_syntax_indicator:   0x%x(%d)\n",tmp->section_syntax_indicator,tmp->section_syntax_indicator);
+	    uprintf("SDT->section_length          :   0x%x(%d)\n",tmp->section_length,tmp->section_length);
+	    uprintf("SDT->transport_stream_id     :   0x%x(%d)\n",tmp->transport_stream_id,tmp->transport_stream_id);
+	    uprintf("SDT->version_number          :   0x%x(%d)\n",tmp->version_number,tmp->version_number);
+	    uprintf("SDT->current_next_indicator  :   0x%x(%d)\n",tmp->current_next_indicator,tmp->current_next_indicator);
+	    uprintf("SDT->section_number          :   0x%x(%d)\n",tmp->section_number,tmp->section_number);
+	    uprintf("SDT->last_section_number     :   0x%x(%d)\n",tmp->last_section_number,tmp->last_section_number);
+	    uprintf("SDT->original_network_id     :   0x%x(%d)\n",tmp->original_network_id,tmp->original_network_id);
+	    uprintf("SDT->CRC_32                  :   0x%x(%d)\n",tmp->CRC_32,tmp->CRC_32);
+        uprintf("-------------------------------------------\n");
+        uprintf("\nFollowing information is the SDT Service Information.\n\n");
+        show_sdt_service_info(tmp->first_sdt_service);
+        tmp++;
+        //to judge if goto the end. last_8 byte.
+        ptmp = (unsigned int *)tmp;
+    }
+    return 0;
 }
+
+
+
+void show_sdt_service_descriptors_info(SDT_SERVICE * sdtService)
+{
+    DESCRIPTOR_COMMON *head = sdtService->first_desc;
+    
+    show_desc(head); 
+}
+
+
 
 
 void free_sdt_service(TS_SDT_TABLE * sdt)
@@ -171,8 +245,22 @@ void free_sdt_service(TS_SDT_TABLE * sdt)
 }
 
 
-void free_sdt(TS_SDT_TABLE * sdt)
+void free_sdt_table(TS_SDT_TABLE * sdt_table_header)
 {
-	free_sdt_service(sdt);
+    TS_SDT_TABLE *tmp = sdt_table_header;
+    
+    unsigned int *ptmp = (unsigned int *)tmp;
+
+    while(NULL != tmp && (ptmp[0] | ptmp[1]) != 0)
+    {
+        free_sdt_service(tmp);
+        tmp++;
+        //to jedge if goto the end. last_8 byte.
+        ptmp = (unsigned int *)tmp;
+    }
+
+    free(sdt_table_header);
+    sdt_table_header = NULL;
+    
 }
 

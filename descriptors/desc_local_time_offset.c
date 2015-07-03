@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sdt.h>
+#include <descriptor_common.h>
 #include <desc_local_time_offset.h>
 #include <print_debug.h>
 
@@ -40,7 +42,7 @@ void decode_localtime_offset_item(unsigned char* byteptr, LOCAL_TIME_OFFSET_ITEM
 }
 
 
-SDT_DESCRIPTOR_COMMON * decode_local_time_offset_desc(unsigned char* byteptr, int this_section_length)
+DESCRIPTOR_COMMON * decode_local_time_offset_desc(unsigned char* byteptr, int this_section_length)
 {
 	unsigned char* b = byteptr;
 
@@ -75,7 +77,7 @@ SDT_DESCRIPTOR_COMMON * decode_local_time_offset_desc(unsigned char* byteptr, in
 		len -= 13;
 	}
 
-	return (SDT_DESCRIPTOR_COMMON *)desc_localtime_offset;
+	return (DESCRIPTOR_COMMON *)desc_localtime_offset;
 }
 
 
@@ -96,7 +98,7 @@ void free_localtime_offset_item(LOCAL_TIME_OFFSET_ITEM *phead)
 }
 
 
-void free_local_time_offset_desc(SDT_DESCRIPTOR_COMMON *head)
+void free_local_time_offset_desc(DESCRIPTOR_COMMON *head)
 {
 	LOCAL_TIME_OFFSET_DESC *phead = (LOCAL_TIME_OFFSET_DESC *)head;
     
@@ -128,7 +130,7 @@ void show_localtime_offset_item(LOCAL_TIME_OFFSET_ITEM *head)
 }
 
 
-void show_local_time_offset_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
+void show_local_time_offset_descriptor(DESCRIPTOR_COMMON *ptmp)
 {
     LOCAL_TIME_OFFSET_DESC * tmp = (LOCAL_TIME_OFFSET_DESC *)ptmp;
 	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);

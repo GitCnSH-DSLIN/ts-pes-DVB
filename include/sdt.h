@@ -6,8 +6,11 @@
 *
 *********************************************************************/
 
-#ifndef  _MPEG_TS_SI_H_
-#define  _MPEG_TS_SI_H_
+#ifndef  _MPEG_TS_SI_SDT_H_
+#define  _MPEG_TS_SI_SDT_H_
+
+#include <descriptor_common.h>
+
 /*********************************************************************
  *              SDT releated struction
  *   struction : sdt table --> sdt_service --> descriptor
@@ -17,11 +20,6 @@
 #define TABLE_ID_SDT_ACTUAL     (0x42)
 #define TABLE_ID_SDT_OTHER     (0x46)
 
-typedef struct sdt_descriptor_common{
-    unsigned char descriptor_tag;
-    unsigned char descriptor_length;
-    struct sdt_descriptor_common * next_desc;
-}SDT_DESCRIPTOR_COMMON, *P_SDT_DESCRIPTOR_COMMON;
 
 //SDT service
 typedef struct sdt_service {
@@ -33,7 +31,7 @@ typedef struct sdt_service {
 	unsigned free_CA_mode : 1;
 	unsigned descriptors_loop_length : 12;
 	
-    SDT_DESCRIPTOR_COMMON * first_desc; //point to descriptor list.
+    DESCRIPTOR_COMMON * first_desc; //point to descriptor list.
 
 	struct sdt_service* next_sdt_service;
 }SDT_SERVICE, *P_SDT_SERVICE;
@@ -57,6 +55,7 @@ typedef struct ts_sdt_table {
 	unsigned reserved_future_use_2 : 8;
 	
     SDT_SERVICE * first_sdt_service;
+    struct ts_sdt_table * sdt_next_section;
 	unsigned CRC_32;
 }TS_SDT_TABLE,*P_TS_SDT_TABLE;
 
@@ -110,11 +109,18 @@ typedef struct ts_sdt_table {
 							((b[base] << 24) | (b[base + 1] << 16) | (b[base + 2] << 8) | b[base + 3]); \
 							})
 
-int parse_sdt_table(unsigned char* byteptr, int this_section_length, TS_SDT_TABLE * sdt);
-int decode_sdt_service(unsigned char* byteptr, int this_section_length, SDT_SERVICE * sdt_service);
-void free_sdt_service(TS_SDT_TABLE * sdtService);
-void free_sdt(TS_SDT_TABLE * sdtTable);
-void show_sdt_table_info(TS_SDT_TABLE * pSdtTable);
+
+P_SDT_SERVICE insert_sdt_service_node(SDT_SERVICE * Header, SDT_SERVICE * node);
+int decode_sdt_service(unsigned char * byteptr, int this_section_length, SDT_SERVICE* psdtService);
+TS_SDT_TABLE * parse_sdt_table(FILE *pFile, unsigned int packetLength);
+TS_SDT_TABLE * parse_sdt_table_onesection(unsigned char *byteptr, TS_SDT_TABLE * pSdtTable);
+void show_sdt_service_info(SDT_SERVICE * Header);
+void show_sdt_service_descriptors_info(SDT_SERVICE * sdtService);
+int show_sdt_table_info(TS_SDT_TABLE * pSdtTable);
+void show_sdt_service_descriptors_info(SDT_SERVICE * sdtService);
+void free_sdt_service(TS_SDT_TABLE * sdt);
+void free_sdt_table(TS_SDT_TABLE * sdt_table_header);
+
 /***************************** End of SDT releated struction **********************/
 
 #endif   /* ----- #ifndef _MPEG_TS_SI_H_  ----- */

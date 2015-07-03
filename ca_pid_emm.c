@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ca_pid_emm.h>
-#include <ts_psi.h>
+#include <tslib.h>
 #include <ts_list.h>
 #include <print_debug.h>
 
@@ -49,6 +49,8 @@ CA_PID_EMM *ca_pid_add_list(CA_PID_EMM *Header, CA_PID_EMM *newNode)
     CA_PID_EMM * lastNode = ca_pid_list_lastnode(Header);
 
                  lastNode->next_section = newNode;
+
+                 return Header;
 }
 
 

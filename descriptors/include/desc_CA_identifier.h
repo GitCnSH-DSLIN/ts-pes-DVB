@@ -14,15 +14,15 @@
 typedef struct CA_identifier_descriptor{
     unsigned char descriptor_tag;
     unsigned char descriptor_length;
-    struct sdt_descriptor_common * next_desc;
+    struct descriptor_common * next_desc;
     unsigned short * CA_system_id;
 }CA_IDENTIFIER_DESC, *P_CA_IDENTIFIER_DESC;
 
 
-SDT_DESCRIPTOR_COMMON * decode_CA_identifier_desc(unsigned char* byteptr, int this_section_length);
+DESCRIPTOR_COMMON * decode_CA_identifier_desc(unsigned char* byteptr, int this_section_length);
 
-void free_CA_identifier_desc(SDT_DESCRIPTOR_COMMON * head);
+void free_CA_identifier_desc(DESCRIPTOR_COMMON * head);
 
-void show_CA_identifier_descriptor(SDT_DESCRIPTOR_COMMON *ptmp);
+void show_CA_identifier_descriptor(DESCRIPTOR_COMMON *ptmp);
 
 #endif

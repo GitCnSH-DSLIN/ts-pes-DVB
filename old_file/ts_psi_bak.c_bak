@@ -19,41 +19,6 @@
 void init_ts_psi_list(void)
 {
     INIT_LIST_HEAD(&__ts_pat_program_list.list);
-    INIT_LIST_HEAD(&__ts_pmt_stream_list.list);
-}
-
-
-/*  
- *  Function    : Parse the header of ts packet header.
- */
-int parse_ts_packet_header(TS_PACKET_HEADER *packet_head, unsigned char *buffer)
-{
-    packet_head->sync_byte                      =   buffer[0];
-    packet_head->transport_error_indicator      =   buffer[1] >> 7;
-    packet_head->payload_unit_start_indicator   =   buffer[1] >> 6 & 0x01;
-    packet_head->transport_priority             =   buffer[1] >> 5 & 0x01;
-    packet_head->pid                            =   ((buffer[1] & 0x1F) << 8) | buffer[2];
-    packet_head->transport_scrambling_control   =   buffer[3] >> 6;
-    packet_head->adaptation_field_control       =   (buffer[3] >> 4) & 0x03;
-
-    packet_head->continuity_counter             =   buffer[3] & 0x0f;
-    
-    return 0;
-}
-
-int show_ts_packet_header(TS_PACKET_HEADER *packet_head)
-{
-    uprintf("transport_packet()\n");
-    uprintf("sync_byte                      :  0x%X\n", packet_head->sync_byte);
-    uprintf("transport_error_indicator      :  0x%X\n", packet_head->transport_error_indicator);
-    uprintf("payload_unit_start_indicator   :  0x%X\n", packet_head->payload_unit_start_indicator);
-    uprintf("transport_priority             :  0x%X\n", packet_head->transport_priority);
-    uprintf("pid                            :  0x%X\n", packet_head->pid);
-    uprintf("transport_scrambling_control   :  0x%X\n", packet_head->transport_scrambling_control);
-    uprintf("adaptation_field_control       :  0x%X\n", packet_head->adaptation_field_control);
-    uprintf("continuity_counter             :  0x%X\n", packet_head->continuity_counter);
-    
-    return 0;
 }
 
 

@@ -8,10 +8,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sdt.h>
+#include <descriptor_common.h>
 #include <desc_component.h>
 #include <print_debug.h>
 
-SDT_DESCRIPTOR_COMMON * decode_component_desc(unsigned char * byteptr, int this_section_length)
+DESCRIPTOR_COMMON * decode_component_desc(unsigned char * byteptr, int this_section_length)
 {
 	unsigned char* b = byteptr;
 
@@ -24,13 +26,13 @@ SDT_DESCRIPTOR_COMMON * decode_component_desc(unsigned char * byteptr, int this_
 	desc_component->component_type          = COMPONENT_DESC_COMPONENT_TYPE(b);
 	desc_component->ISO_639_language_code   = COMPONENT_DESC_ISO_639_LANGUAGE_CODE(b);
 
-	desc_component->text_char = (char*)calloc(desc_component->descriptor_length - 6 + 1, sizeof(char));
-	strncpy(desc_component->text_char, (char*)&b[8], desc_component->descriptor_length - 6);
+	desc_component->text_char = (unsigned char*)calloc(desc_component->descriptor_length - 6 + 1, sizeof(char));
+	strncpy(desc_component->text_char, (unsigned char*)&b[8], desc_component->descriptor_length - 6);
 	
-    return (SDT_DESCRIPTOR_COMMON *)desc_component; 
+    return (DESCRIPTOR_COMMON *)desc_component; 
 }
 
-void free_component_desc(SDT_DESCRIPTOR_COMMON* head)
+void free_component_desc(DESCRIPTOR_COMMON* head)
 {
 	COMPONENT_DESC * phead = (COMPONENT_DESC *)head;
     free(phead->text_char);
@@ -44,7 +46,7 @@ void free_component_desc(SDT_DESCRIPTOR_COMMON* head)
     head  = NULL;
 }
 
-void show_component_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
+void show_component_descriptor(DESCRIPTOR_COMMON *ptmp)
 {
     COMPONENT_DESC * tmp = (COMPONENT_DESC*)ptmp;
 	uprintf("\t\tdescriptor_tag     :   0x%x\n",tmp->descriptor_tag);
@@ -53,7 +55,7 @@ void show_component_descriptor(SDT_DESCRIPTOR_COMMON *ptmp)
 	uprintf("\t\tstream_content     :   0x%x(%d)\n",tmp->stream_content, tmp->stream_content);
 	uprintf("\t\tcomponent_type     :   0x%x(%d)\n",tmp->component_type, tmp->component_type);
 	uprintf("\t\tISO_639_langua_code:   0x%x(%d)\n",tmp->ISO_639_language_code, tmp->ISO_639_language_code);
-	uprintf("\t\ttext_char          :   %s\n",tmp->text_char);
+	uprintf("\t\ttext_char          :   %s\n\n",tmp->text_char);
 }
 
 
