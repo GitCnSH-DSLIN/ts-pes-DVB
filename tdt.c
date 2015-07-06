@@ -19,6 +19,7 @@ TS_TDT_TABLE * parse_tdt_table_onesection(unsigned char *byteptr, TS_TDT_TABLE *
     parse_ts_packet_header(&mtsPacketHeader,byteptr);
 
     unsigned int offset = locate_offset(&mtsPacketHeader, byteptr, PSI_SI_PACKET_FLAG, 0);
+    uprintf("the value of offset is %d\n",offset);
     unsigned char * b = byteptr + offset;
 
 	
@@ -27,11 +28,9 @@ TS_TDT_TABLE * parse_tdt_table_onesection(unsigned char *byteptr, TS_TDT_TABLE *
 	pTdtTable->reserved_future_use_1 = TDT_RESERVED_FUTURE_USE_1(b);
 	pTdtTable->reserved_1 = TDT_RESERVED_1(b);
 	pTdtTable->section_length = TDT_SECTION_LENGTH(b);
+	pTdtTable->UTC_time = TDT_UTC_TIME(b);
 
-    b += 3 + pTdtTable->section_length;
-	
-    //pTdtTable->UTC_time = TDT_UTC_TIME(b,pTdtTable->UTC_time);
-    pTdtTable->UTC_time = b[0] <<24 | b[1] << 16 |b[2]<<8 | b[3];
+    //uprintf("UTC_time : 0x%lx\n",pTdtTable->UTC_time);
       
     return pTdtTable;
 }
@@ -69,10 +68,10 @@ int show_tdt_table_info(TS_TDT_TABLE * ptdtTable)
     TS_TDT_TABLE *tmp = ptdtTable;
     
     uprintf("-------------------------------------------\n");
-	uprintf("TDT->table_id                :   0x%x(%d)\n",tmp->table_id,tmp->table_id);
-	uprintf("TDT->section_syntax_indicator:   0x%x(%d)\n",tmp->section_syntax_indicator,tmp->section_syntax_indicator);
-	uprintf("TDT->section_length          :   0x%x(%d)\n",tmp->section_length,tmp->section_length);
-	uprintf("TDT->UTC_time                :   0x%lx(%ld)\n",tmp->UTC_time,tmp->UTC_time);
+	uprintf("TDT->table_id                :   %#x(%d)\n",tmp->table_id,tmp->table_id);
+	uprintf("TDT->section_syntax_indicator:   %#x(%d)\n",tmp->section_syntax_indicator,tmp->section_syntax_indicator);
+	uprintf("TDT->section_length          :   %#x(%d)\n",tmp->section_length,tmp->section_length);
+	uprintf("TDT->UTC_time                :   %#8lx(%lu)\n",tmp->UTC_time,tmp->UTC_time);
     uprintf("-------------------------------------------\n\n");
     return 0;
 }

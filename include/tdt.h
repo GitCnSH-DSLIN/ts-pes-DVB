@@ -41,10 +41,12 @@ typedef struct ts_tdt_table {
 
 #define	TDT_SECTION_LENGTH(b)			            (((b[1] & 0x0f) << 8) | b[2])			/*  */
 
-#define	TDT_UTC_TIME(b,val)				            ({ \
-                                                    unsigned long * ptmp = val; \
-                                                    ptmp = ((b[0] << 40 ) | b[1] << 32 \
-                                                    | b[2] <<16 | b[3] << 8 | b[4]); \
+#define	TDT_UTC_TIME(b)				                ({ \
+                                                    unsigned long utc_high,utc_low; \
+                                                    utc_high = ((unsigned long)(b[3] & 0xff)) << 32; \
+                                                    utc_low  = ((unsigned long)(b[4] << 24 | b[5] << 16 | \
+                                                            b[6]<<8 | b[7])) & 0x00ffffffff; \
+                                                    utc_high  | utc_low; \
                                                     })/*  */
 
 
