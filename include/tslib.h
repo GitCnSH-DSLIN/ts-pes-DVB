@@ -93,6 +93,9 @@ TABLE_SECTION_LIST * table_section_list_add(TABLE_SECTION_LIST *head, TABLE_SECT
 TABLE_SECTION_LIST * store_psi_si_table(FILE *pFile, unsigned int mPacketLength, 
         unsigned int mUserPid,unsigned int tableId);
 
+TABLE_SECTION_LIST * store_psi_si_table_reserved(FILE *pFile, unsigned int mPacketLength, 
+        unsigned int mUserPid,unsigned int tableId);
+
 void show_packet_memory(unsigned char * buffer, unsigned int packetLength);
 
 #endif	//_MPEG_TS_H_

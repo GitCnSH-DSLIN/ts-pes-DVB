@@ -3,8 +3,7 @@
 #include <string.h>
 #include <print_debug.h>
 #include <tslib.h>
-
-//#define DEBUG_DETAIL
+#define DEBUG_DETAIL
 
 /*  
  *  Function    : Parse the header of ts packet header.
@@ -146,10 +145,10 @@ int store_one_section_data(FILE *pFile, unsigned int mPacketLength, TABLE_SECTIO
                 && (1 == TS_PACKET_HEADER_PAYLOAD_UNIT_START_INDICATOR(ptsbuffer)))
         {
             ret = 0;
-//            uprintf("the section length is %d\n",TS_PSI_SI_TABLE_SECTION_LENGTH(ptsbuffer, offset_length));
+            uprintf("the section length is %d\n",TS_PSI_SI_TABLE_SECTION_LENGTH(ptsbuffer, offset_length));
             unsigned int continuity_counter = ptsPacketHeader->continuity_counter;            
             p_table_section->buffer_size    = TS_PSI_SI_TABLE_SECTION_LENGTH(ptsbuffer, offset_length) + SECTION_INFO_HEADER_SIZE + offset_length;
-//            uprintf("the value of buffer_size if %d\n", p_table_section->buffer_size);
+            uprintf("the value of buffer_size if %d\n", p_table_section->buffer_size);
             buffer_size                     = p_table_section->buffer_size;
             section_size                    = buffer_size - SECTION_INFO_HEADER_SIZE - offset_length;
             p_table_section->pbuffer        = (unsigned char *)malloc(buffer_size);
@@ -161,29 +160,30 @@ int store_one_section_data(FILE *pFile, unsigned int mPacketLength, TABLE_SECTIO
             unsigned char *pbuffer_index    = p_table_section->pbuffer;
             //for the payload_unit_start, we directory copy from the ts start byte----sync.(other ts packet don't have the
             //table id and so on
+    
+            unsigned int calculate_count = (section_size +SECTION_INFO_HEADER_SIZE + offset_length)/mPacketLength;
 
-            unsigned int copy_loop_total = (section_size + SECTION_INFO_HEADER_SIZE + offset_length) / mPacketLength;
+            unsigned int copy_loop_total = (section_size + SECTION_INFO_HEADER_SIZE + offset_length*(calculate_count+1)) / mPacketLength;
             unsigned int copy_count = 0;
             if(0 == copy_loop_total)
                 memcpy(pbuffer_index, ptsbuffer, buffer_size);
             else
             {
-                unsigned int first_copy_flag = 1;
-                while(buffer_size > 0)
+                for (; copy_count <= copy_loop_total;)
                 {
-                    if(1 == first_copy_flag)
+                    if(0 == copy_count)
                     {
-                        first_copy_flag = 0;
                         memcpy(pbuffer_index, ptsbuffer, mPacketLength);
                     #ifdef DEBUG_DETAIL
-                        uprintf("the offset_length is %d\n",offset_length);
-                        uprintf("We copy %d byte and buffer_reserved  is %d\n",mPacketLength, buffer_size - mPacketLength);
-                        show_packet_memory(ptsbuffer, mPacketLength);
-                        show_packet_memory(pbuffer_index,mPacketLength);
+                        uprintf("the offset_length is %d and copy_count is 0\n",offset_length);
+//                        show_packet_memory(ptsbuffer, mPacketLength);
+//                        show_packet_memory(pbuffer_index,mPacketLength-offset_length);
                     #endif
+                        copy_count++;
                         pbuffer_index += mPacketLength;
                         buffer_size   -= mPacketLength;
-                        copy_count++;
+                        uprintf("We copy %d byte and After copy the buffer_reserved  is %d\n",mPacketLength, buffer_size);
+
                     }
                     else
                     {
@@ -191,47 +191,46 @@ int store_one_section_data(FILE *pFile, unsigned int mPacketLength, TABLE_SECTIO
                         {
                             fseek(pFile, 0, SEEK_SET);
                             fread(ptsbuffer, mPacketLength, 1, pFile);
-                        } 
-                        
+                        }
+
                         parse_ts_packet_header(ptsPacketHeader, ptsbuffer);
                         offset_length = locate_offset(ptsPacketHeader, ptsbuffer, PSI_SI_PACKET_FLAG, 0);
 
                         if(pid == ptsPacketHeader->pid
                                 && (ptsPacketHeader->continuity_counter == (continuity_counter + copy_count)%16)) 
                         {
-                            if(buffer_size + SECTION_INFO_HEADER_SIZE + offset_length < mPacketLength)
+                            if(copy_count == copy_loop_total)
                             {
                                 memcpy(pbuffer_index, ptsbuffer + offset_length, buffer_size);
-                            
                             #ifdef DEBUG_DETAIL
-                                uprintf("We copy %d byte and buffer_reserved  is 0\n",buffer_size);
-                                uprintf("the offset_length is %d",offset_length);
+                                uprintf("the offset_length is %d and copy_count is %d\n",offset_length,copy_count);
                                 show_packet_memory(ptsbuffer, buffer_size);
-                                uprintf("Copy Finished\n");
+                                //show_packet_memory(pbuffer_index,buffer_size-offset_length);
                             #endif
                                 pbuffer_index += buffer_size;
                                 buffer_size -=buffer_size;
-                                break; 
+                                uprintf("After copy the buffer_reserved  is %d\n",buffer_size);
                             }
                             else
                             {
                                 memcpy(pbuffer_index, ptsbuffer + offset_length, mPacketLength-offset_length);
-
                             #ifdef DEBUG_DETAIL
-                                uprintf("the offset_length is %d\n",offset_length);
-                                uprintf("We copy %d byte and buffer_reserved  is %d\n",mPacketLength-offset_length,buffer_size-(mPacketLength-offset_length));
+                                uprintf("the offset_length is %d and copy_count is %d\n",offset_length,copy_count);
                                 show_packet_memory(ptsbuffer, mPacketLength);
+                                //show_packet_memory(pbuffer_index,mPacketLength-offset_length);
+                                //printf("----------------------------------------------------\n");
+                                //show_packet_memory(p_table_section->pbuffer,p_table_section->buffer_size);
                             #endif
                                 pbuffer_index += mPacketLength - offset_length;
                                 buffer_size   -= (mPacketLength - offset_length);
-                                copy_count++;
+                                uprintf("We copy %d byte and After copy the buffer_reserved  is %d\n",buffer_size);
                             }
 
+                            copy_count++;
                         }
                     }
+                }//end of for
                 
-                }
-
             }//end of if ... else
         
             break;
@@ -327,14 +326,14 @@ TABLE_SECTION_LIST * table_section_list_add(TABLE_SECTION_LIST *head, TABLE_SECT
                     p_section_head = alloc_and_init_table_section(tmp_ts_buffer, i, offset_length);
                     store_one_section_data(pFile, mPacketLength, p_section_head);
 
-                    //show_packet_memory(p_section_head->pbuffer,p_section_head->buffer_size);
+                    show_packet_memory(p_section_head->pbuffer,p_section_head->buffer_size);
                 }
                 else
                 {
                     p_section_node = alloc_and_init_table_section(tmp_ts_buffer, i, offset_length);
                     store_one_section_data(pFile, mPacketLength, p_section_node);
                     
-                    //show_packet_memory(p_section_node->pbuffer,p_section_node->buffer_size);
+                    show_packet_memory(p_section_head->pbuffer,p_section_head->buffer_size);
                     
                     table_section_list_add(p_section_head, p_section_node);
                 }

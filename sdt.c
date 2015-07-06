@@ -162,7 +162,7 @@ TS_SDT_TABLE * parse_sdt_table_onesection(unsigned char *byteptr, TS_SDT_TABLE *
 
     //show_sdt_table_info(pSdtTable);
 
-    return 0;
+    return pSdtTable;
 }
 
 

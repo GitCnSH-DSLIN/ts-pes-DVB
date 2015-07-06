@@ -1,63 +1,67 @@
 /*********************************************************************
-*
-* Filename      :   sdt.h
-* Description   :   given the fundamental struction of SDT table and SDT service.
+* Filename      :   eit.h
+* Description   :   given the fundamental struction of EIT table.
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/
 
-#ifndef  _MPEG_TS_SI_SDT_H_
-#define  _MPEG_TS_SI_SDT_H_
+#ifndef  _MPEG_TS_SI_EIT_H_
+#define  _MPEG_TS_SI_EIT_H_
 
 #include <descriptor_common.h>
 
 /*********************************************************************
- *              SDT releated struction
- *   struction : sdt table --> sdt_service --> descriptor
+ *              EIT releated struction
+ *   struction : eit table --> eit_envet --> descriptor
  *   
  *********************************************************************/
-#define PID_TS_SI_SDT   (0x0011)
-#define TABLE_ID_SDT_ACTUAL     (0x42)
-#define TABLE_ID_SDT_OTHER     (0x46)
+#define PID_TS_SI_EIT                   (0x0012)
+
+#define TABLE_ID_EIT_ACTUAL             (0x4E)
+#define TABLE_ID_EIT_OTHER              (0x4F)
+#define TABLE_ID_EIT_ACTUAL_SCHEDULE    (0x4E)
+#define TABLE_ID_EIT_OTHER_SCHEDULE     (0x4F)
 
 
-//SDT service
-typedef struct sdt_service {
-	unsigned service_id : 16;
-	unsigned reserved_future_use : 6;
-	unsigned EIT_schedule_flag : 1;
-	unsigned EIT_present_following_flag : 1;
-	unsigned running_status : 3;
-	unsigned free_CA_mode : 1;
-	unsigned descriptors_loop_length : 12;
+//EIT Event
+typedef struct eit_event {
+	unsigned long event_id : 16;
+	unsigned long start_time : 40;
+	unsigned long duration : 24;
+	unsigned long running_status : 3;
+	unsigned long running_status : 3;
+	unsigned long free_CA_mode : 1;
+	unsigned long descriptors_loop_length : 12;
 	
     DESCRIPTOR_COMMON * first_desc; //point to descriptor list.
 
-	struct sdt_service* next_sdt_service;
-}SDT_SERVICE, *P_SDT_SERVICE;
+	struct eit_event * next_eit_event;
+}EIT_EVENT, *P_EIT_EVENT;
 
 
 
-//SDT table
+//EIT table
 typedef struct ts_sdt_table {
 	unsigned table_id : 8;
 	unsigned section_syntax_indicator : 1;
 	unsigned reserved_future_use_1 : 1;
 	unsigned reserved_1 : 2;
 	unsigned section_length : 12;
-	unsigned transport_stream_id : 16;
+	unsigned service_id : 16;
 	unsigned reserved_2 : 2;
 	unsigned version_number : 5;
 	unsigned current_next_indicator : 1;
 	unsigned section_number : 8;
 	unsigned last_section_number : 8;
+	unsigned transport_steam_id : 16;
 	unsigned original_network_id : 16;
-	unsigned reserved_future_use_2 : 8;
+	unsigned segment_last_section_number : 8;
+	unsigned last_table_id : 8;
 	
-    SDT_SERVICE * first_sdt_service;
-    struct ts_sdt_table * sdt_next_section;
+    EIT_EVENT * first_eit_event;
+    struct ts_eit_table * eit_next_section;
 	unsigned CRC_32;
-}TS_SDT_TABLE,*P_TS_SDT_TABLE;
+}TS_EIT_TABLE,*P_TS_EIT_TABLE;
 
 //releated operation
 
@@ -124,3 +128,4 @@ void free_sdt_table(TS_SDT_TABLE * sdt_table_header);
 /***************************** End of SDT releated struction **********************/
 
 #endif   /* ----- #ifndef _MPEG_TS_SI_H_  ----- */
+
