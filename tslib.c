@@ -4,7 +4,7 @@
 #include <print_debug.h>
 #include <tslib.h>
 
-#define DEBUG_DETAIL
+//#define DEBUG_DETAIL
 
 /*  
  *  Function    : Parse the header of ts packet header.
@@ -495,14 +495,12 @@ int store_one_section_data_reserved(FILE *pFile, unsigned int mPacketLength, TAB
         unsigned int mUserPid,unsigned int tableId)
 {
     unsigned int offset_length = 0;
-    unsigned int last_section_number = 0;
     unsigned char * tmp_ts_buffer = (unsigned char *)malloc(mPacketLength);
 
     TS_PACKET_HEADER tsPacketHeader;
     P_TS_PACKET_HEADER ptsPacketHeader = &tsPacketHeader;
 
     TABLE_SECTION_LIST * p_section_head = NULL;
-    TABLE_SECTION_LIST * p_section_node = NULL;
 
     fseek(pFile, 0, SEEK_SET);
 
@@ -518,7 +516,9 @@ int store_one_section_data_reserved(FILE *pFile, unsigned int mPacketLength, TAB
             //last_section_number = TS_PSI_SI_TABLE_LAST_SECTION_NUM(tmp_ts_buffer,offset_length);
             p_section_head = alloc_and_init_table_section(tmp_ts_buffer, 0, offset_length);
             store_one_section_data_reserved(pFile, mPacketLength, p_section_head);
+        #ifdef DEBUG_DETAIL
             show_packet_memory(p_section_head->pbuffer,p_section_head->buffer_size);
+        #endif
             break;
         }
     }//end of while

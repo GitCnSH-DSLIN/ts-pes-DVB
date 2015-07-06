@@ -8,7 +8,7 @@
 #include <pmt.h>
 #include <pes.h>
 #include <print_debug.h>
-#include <tot.h>
+#include <tdt.h>
 
 #define BUFFER_SIZE     (4096)
 
@@ -24,11 +24,11 @@ int main(int argc, char * argv[])
         return -1;
     }
     /**************************************************************************/
-    TS_TOT_TABLE * tot_table_head = parse_tot_table(pFile, packetLength);
+    TS_TDT_TABLE * tdt_table_head = parse_tdt_table(pFile, packetLength);
 
-    show_tot_table_info(tot_table_head);
-    free_tot_table(tot_table_head);
-    tot_table_head = NULL;
+    show_tdt_table_info(tdt_table_head);
+    free_tdt_table(tdt_table_head);
+    tdt_table_head = NULL;
     /**************************************************************************/
     
     fclose(pFile);

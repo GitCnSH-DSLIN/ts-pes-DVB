@@ -31,9 +31,6 @@
  *
  *
  *********************************************************************/
-#define PID_TS_SI_SDT   (0x0011)
-#define TABLE_ID_SDT_ACTUAL     (0x42)
-
 #define PID_TS_SI_NIT               (0x0010)
 #define TABLE_ID_NIT_ACTUAL         (0x40)
 #define TABLE_ID_NIT_OTHER          (0x41)

@@ -151,7 +151,7 @@ TS_NIT_TABLE * parse_nit_table_onesection(unsigned char *byteptr, TS_NIT_TABLE *
     if(0 == len)
     {
         pNitTable->first_transport_stream = NULL;
-        return 0;
+        return pNitTable;
     }
 
 	while(len > 0)
@@ -173,7 +173,7 @@ TS_NIT_TABLE * parse_nit_table_onesection(unsigned char *byteptr, TS_NIT_TABLE *
         serv_start += transportStreamLength;
     }
 
-    return 0;
+    return pNitTable;
 }
 
 

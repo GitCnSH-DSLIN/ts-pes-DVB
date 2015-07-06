@@ -126,6 +126,7 @@ void show_localtime_offset_item(LOCAL_TIME_OFFSET_ITEM *head)
         uprintf("\t\t\tlocal_time_offset            :   0x%x\n",ptmp->local_time_offset);
         uprintf("\t\t\ttime_of_change               :   0x%lx\n",ptmp->time_of_change);
         uprintf("\t\t\tnext_time_offset             :   0x%x\n\n",ptmp->next_time_offset);
+        ptmp = ptmp->next_item;
     }
 }
 
