@@ -112,7 +112,7 @@ typedef struct ts_sdt_table {
 
 P_SDT_SERVICE insert_sdt_service_node(SDT_SERVICE * Header, SDT_SERVICE * node);
 int decode_sdt_service(unsigned char * byteptr, int this_section_length, SDT_SERVICE* psdtService);
-TS_SDT_TABLE * parse_sdt_table(FILE *pFile, unsigned int packetLength);
+TS_SDT_TABLE * parse_sdt_table(FILE *pFile, unsigned int packetLength, unsigned int SDT_TABLE_ID);
 TS_SDT_TABLE * parse_sdt_table_onesection(unsigned char *byteptr, TS_SDT_TABLE * pSdtTable);
 void show_sdt_service_info(SDT_SERVICE * Header);
 void show_sdt_service_descriptors_info(SDT_SERVICE * sdtService);

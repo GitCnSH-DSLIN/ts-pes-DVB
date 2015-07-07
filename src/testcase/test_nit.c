@@ -24,7 +24,7 @@ int main(int argc, char * argv[])
         return -1;
     }
     /**************************************************************************/
-    TS_NIT_TABLE * nit_table_head = parse_nit_table(pFile, packetLength);
+    TS_NIT_TABLE * nit_table_head = parse_nit_table(pFile, packetLength,TABLE_ID_NIT_ACTUAL);
 
     show_nit_table_info(nit_table_head);
     free_nit_table(nit_table_head);

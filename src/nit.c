@@ -59,9 +59,9 @@ int decode_nit_transport_stream(unsigned char * byteptr, int this_section_length
 
 
 
-TS_NIT_TABLE * parse_nit_table(FILE *pFile, unsigned int packetLength)
+TS_NIT_TABLE * parse_nit_table(FILE *pFile, unsigned int packetLength, unsigned int NIT_TABLE_ID)
 {
-    TABLE_SECTION_LIST * nit_section = store_psi_si_table(pFile, packetLength, PID_TS_SI_NIT, TABLE_ID_NIT_ACTUAL);
+    TABLE_SECTION_LIST * nit_section = store_psi_si_table(pFile, packetLength, PID_TS_SI_NIT, NIT_TABLE_ID);
     TABLE_SECTION_LIST * nit_section_index = nit_section;
     //the last 8 byte is the end flag
     TS_NIT_TABLE * nit_table_head = (TS_NIT_TABLE *)malloc(sizeof(TS_NIT_TABLE)*(nit_section->last_section_number + 1) + 2*sizeof(int));

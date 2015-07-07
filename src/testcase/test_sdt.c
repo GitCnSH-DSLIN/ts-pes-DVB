@@ -21,7 +21,7 @@ int main(int argc, char * argv[])
         return -1;
     }
     /**************************************************************************/
-    TS_SDT_TABLE * sdt_table_head = parse_sdt_table(pFile, packetLength);
+    TS_SDT_TABLE * sdt_table_head = parse_sdt_table(pFile, packetLength,TABLE_ID_SDT_ACTUAL);
 
     show_sdt_table_info(sdt_table_head);
     free_sdt_table(sdt_table_head);

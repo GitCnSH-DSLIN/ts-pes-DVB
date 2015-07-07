@@ -61,9 +61,9 @@ int decode_sdt_service(unsigned char * byteptr, int this_section_length, SDT_SER
 
 
 
-TS_SDT_TABLE * parse_sdt_table(FILE *pFile, unsigned int packetLength)
+TS_SDT_TABLE * parse_sdt_table(FILE *pFile, unsigned int packetLength, unsigned int SDT_TABLE_ID)
 {
-    TABLE_SECTION_LIST * sdt_section = store_psi_si_table(pFile, packetLength, PID_TS_SI_SDT, TABLE_ID_SDT_OTHER);
+    TABLE_SECTION_LIST * sdt_section = store_psi_si_table(pFile, packetLength, PID_TS_SI_SDT, SDT_TABLE_ID);
     TABLE_SECTION_LIST * sdt_section_index = sdt_section;
     //the last 8 byte is the end flag
     TS_SDT_TABLE * sdt_table_head = (TS_SDT_TABLE *)malloc(sizeof(TS_SDT_TABLE)*(sdt_section->last_section_number + 1) + 2*sizeof(int));

@@ -113,7 +113,7 @@ typedef struct ts_nit_table {
 
 P_TRANSPORT_STREAM insert_nit_transport_stream_node(TRANSPORT_STREAM * Header, TRANSPORT_STREAM * node);
 int decode_nit_transport_stream(unsigned char * byteptr, int this_section_length, TRANSPORT_STREAM * pNitTranstream);
-TS_NIT_TABLE * parse_nit_table(FILE *pFile, unsigned int packetLength);
+TS_NIT_TABLE * parse_nit_table(FILE *pFile, unsigned int packetLength, unsigned int NIT_TABLE_ID);
 TS_NIT_TABLE * parse_nit_table_onesection(unsigned char *byteptr, TS_NIT_TABLE * pNitTable);
 
 void show_nit_transport_stream_info(TRANSPORT_STREAM * Header);
