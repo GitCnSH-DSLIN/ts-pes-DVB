@@ -1,7 +1,7 @@
 /*********************************************************************
 *
 * Filename      :   nit.c
-* Description   :   fundamental operation for SDT table and SDT service.
+* Description   :   fundamental operation for nit table.
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/

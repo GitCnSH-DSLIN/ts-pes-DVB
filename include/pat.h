@@ -1,7 +1,7 @@
 /*********************************************************************
 *
 * Filename      :   pat.h
-* Description   :   
+* Description   :   fundamental struction of PAT table
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/

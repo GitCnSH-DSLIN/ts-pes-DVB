@@ -1,7 +1,7 @@
 /*********************************************************************
 *
 * Filename      :   pes.c
-* Description   :   
+* Description   :   fundamental operation of PES data
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/

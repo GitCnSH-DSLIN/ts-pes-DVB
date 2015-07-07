@@ -1,7 +1,7 @@
 /*********************************************************************
 *
 * Filename      :   pmt.h
-* Description   :   
+* Description   :   fundamental struction of PMT table
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/

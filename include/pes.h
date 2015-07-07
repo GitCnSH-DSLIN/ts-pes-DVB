@@ -1,7 +1,7 @@
 /*********************************************************************
 *
 * Filename      :   pes.h
-* Description   :   
+* Description   :   fundamental struction of PES data
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/

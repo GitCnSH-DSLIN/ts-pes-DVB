@@ -1,7 +1,7 @@
 /*********************************************************************
 *
 * Filename      :   pmt.c
-* Description   :   fundamental operation of psi protocol of DVB
+* Description   :   fundamental operation of PMT table
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/
@@ -332,6 +332,7 @@ int show_pmt_stream_info(void)
 
     return 0;
 }
+
 
 
 int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength)

@@ -1,7 +1,7 @@
 /*********************************************************************
 *
 * Filename      :   tot.h
-* Description   :   
+* Description   :   fundamental struction for TOT table.
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/
@@ -75,6 +75,6 @@ void free_tot_table(TS_TOT_TABLE * tot_table_header);
 
 /***************************** End of TDT releated struction **********************/
 
-#endif   /* ----- #ifndef _MPEG_TS_SI_H_  ----- */
+#endif   /* ----- #ifndef _MPEG_TS_SI_TOT_H_  ----- */
 
 

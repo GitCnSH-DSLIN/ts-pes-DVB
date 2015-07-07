@@ -1,19 +1,27 @@
 /*********************************************************************
 *
-* Filename      :   sdt_descriptor.h
-* Description   :   given the fundamental struction for descriptors of sdt service.
+* Filename      :   descriptor_common.h
+* Description   :   given the fundamental struction for descriptors.
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/
 #ifndef  _MPEG_TS_SI_DESCRIPTOR_COMMON_H_
 #define  _MPEG_TS_SI_DESCRIPTOR_COMMON_H_
 
-
+/*  
+ *  Descriptors : Common descriptor for all the descriptors. 
+ *  
+ *  Details     : used for varity of descriptors.
+ *
+ *  Note        : need type Coercion
+ */
 typedef struct descriptor_common{
     unsigned char descriptor_tag;
     unsigned char descriptor_length;
     struct descriptor_common * next_desc;
 }DESCRIPTOR_COMMON, *P_DESCRIPTOR_COMMON;
+
+
 
 void (*do_show_descriptors_info[64])(DESCRIPTOR_COMMON *ptmp);
 

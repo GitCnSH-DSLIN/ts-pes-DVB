@@ -3,10 +3,6 @@
 #include <string.h>
 #include <ts_list.h>
 #include <tslib.h>
-#include <ca_pid_emm.h>
-#include <pat.h>
-#include <pmt.h>
-#include <pes.h>
 #include <print_debug.h>
 #include <tdt.h>
 
@@ -15,7 +11,7 @@
 int main(int argc, char * argv[])
 {
    
-    FILE *pFile, *pSaveFile;
+    FILE *pFile;
     unsigned int packetLength = TS_PACKET_SIZE;    
 
     if((pFile = fopen("ocn_203.ts","rb")) == NULL)

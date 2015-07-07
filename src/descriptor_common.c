@@ -1,7 +1,7 @@
 /*********************************************************************
 *
-* Filename      :   sdt_descriptor.c
-* Description   :   fundamental operation and framework of descriptors of sdt service.
+* Filename      :   descriptor_common.c
+* Description   :   fundamental operation and framework of descriptors.
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/
@@ -93,7 +93,11 @@ DESCRIPTOR_COMMON * (*do_decode_desc[64])(unsigned char * byteptr, int this_sect
 
 
 
-
+/*  
+ *  Funciton    : decode all of descriptors and collect it into a list. 
+ *  
+ *  Details     : used recursive call.
+ */
 DESCRIPTOR_COMMON * decode_desc(unsigned char * byteptr, int this_section_length)
 {
     unsigned char descriptor_tag = byteptr[0];
@@ -128,6 +132,7 @@ DESCRIPTOR_COMMON * decode_desc(unsigned char * byteptr, int this_section_length
         this_descriptor->next_desc = decode_desc(b, l);
     return this_descriptor;
 }
+
 
 
 void free_desc_default(DESCRIPTOR_COMMON* head)
@@ -235,6 +240,7 @@ void free_desc(DESCRIPTOR_COMMON *phead)
         exit(-1);
     }
 }
+
 
 
 

@@ -102,5 +102,3 @@ void free_tot_table(TS_TOT_TABLE * tot_table_header)
     free(tot_table_header);
 }
 
-
-

@@ -1,7 +1,7 @@
 /*********************************************************************
 *
 * Filename      :   pat.c
-* Description   :   fundamental operation of psi protocol of DVB
+* Description   :   fundamental operation of PAT table
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/
@@ -15,7 +15,7 @@
 
 
 /*  
- *  Function    : Init the global pat_program_list and pmt_stream list
+ *  Function    : Init the global pat_program_list.
  */
 void init_ts_pat_program_list(void)
 {
@@ -84,6 +84,7 @@ int parse_pat_table_onesection(unsigned char * pBuffer,TS_PAT_TABLE * psiPAT)
     unsigned int offset = locate_offset(ptsPacketHeader, pBuffer, PSI_SI_PACKET_FLAG, 0);
     unsigned char *buffer = pBuffer;
 
+    
     psiPAT->table_id                    = PAT_TABLE_ID(buffer,offset);  
     psiPAT->section_syntax_indicator    = PAT_SECTION_SYNTAX_INDICATOR(buffer, offset);  
     //psiPAT->zero                        = buffer[1] >> 6 & 0x1;  
@@ -130,9 +131,9 @@ int parse_pat_table_onesection(unsigned char * pBuffer,TS_PAT_TABLE * psiPAT)
         }
     }
 
-    #ifdef DEBUG
-        //show_pat_program_info();
-    #endif
+    //#ifdef DEBUG
+        //show_pat_table_info(psiPAT);
+    //#endif
 
     return ret;
 }
@@ -184,6 +185,7 @@ int show_pat_table_info(TS_PAT_TABLE * patTable)
 
 
 
+//del node from __ts_pat_program_list
 void __remove_ts_pat_program_list_node(unsigned int program_number)
 {
 
@@ -266,6 +268,7 @@ int show_pat_program_info(void)
     
     return 0;
 }
+
 
 int search_given_program_info(unsigned int searchProgramId)
 {

@@ -3,12 +3,8 @@
 #include <string.h>
 #include <ts_list.h>
 #include <tslib.h>
-#include <ca_pid_emm.h>
-#include <pat.h>
-#include <pmt.h>
-#include <pes.h>
 #include <print_debug.h>
-#include <tot.h>
+#include <sdt.h>
 
 #define BUFFER_SIZE     (4096)
 
@@ -17,6 +13,7 @@ int main(int argc, char * argv[])
    
     FILE *pFile, *pSaveFile;
     unsigned int packetLength = TS_PACKET_SIZE;    
+    unsigned char storeIdStream[20]={'\0'};
 
     if((pFile = fopen("ocn_203.ts","rb")) == NULL)
     {
@@ -24,11 +21,11 @@ int main(int argc, char * argv[])
         return -1;
     }
     /**************************************************************************/
-    TS_TOT_TABLE * tot_table_head = parse_tot_table(pFile, packetLength);
+    TS_SDT_TABLE * sdt_table_head = parse_sdt_table(pFile, packetLength);
 
-    show_tot_table_info(tot_table_head);
-    free_tot_table(tot_table_head);
-    tot_table_head = NULL;
+    show_sdt_table_info(sdt_table_head);
+    free_sdt_table(sdt_table_head);
+    sdt_table_head = NULL;
     /**************************************************************************/
     
     fclose(pFile);
