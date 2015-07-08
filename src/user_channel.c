@@ -1,7 +1,7 @@
 /*********************************************************************
 *
-* Filename      :   pmt.c
-* Description   :   fundamental operation of PMT table
+* Filename      :   user_channel.c
+* Description   :   fundamental operation of  user channel info
 * edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 *
 *********************************************************************/
@@ -17,9 +17,9 @@
 /*  
  *  Function    : Init the global __ts_pmt_stream_list
  */
-void init_ts_pmt_stream_list(void)
+void init_ts_user_channel_list(void)
 {
-    INIT_LIST_HEAD(&__ts_pmt_stream_list.list);
+    INIT_LIST_HEAD(&__ts_user_channel_list.list);
 }
 
 
@@ -205,7 +205,7 @@ void free_pmt_table_onesection(TS_PMT_TABLE * pmt_table, int reserve_pmt_list_fl
 
 }
 
-// 1 reserved   0 del
+
 void free_pmt_table_one_program(TS_PMT_TABLE * pmt_table_header, int reserve_pmt_list_flag )
 {
     TS_PMT_TABLE *tmp = pmt_table_header;
@@ -335,34 +335,120 @@ int show_pmt_stream_info(void)
 
 
 
-int setup_pmt_stream_list(FILE *pFile, unsigned int packetLength)
+USER_CHANNEL_INFO * alocate_and_init_user_channel_node(TS_PMT_TABLE *  pmt_table_one_program,
+        unsigned short program_map_pid)
 {
-    struct list_head *pos;
-    P_TS_PAT_Program tmp_pat_program = (P_TS_PAT_Program)malloc(sizeof(TS_PAT_Program));
-    P_TS_PAT_Program pFreetmp = tmp_pat_program;
+    USER_CHANNEL_INFO * user_channel_node = (USER_CHANNEL_INFO *)malloc(sizeof(USER_CHANNEL_INFO));
+    memset(user_channel_node, 0, sizeof(USER_CHANNEL_INFO));
+
+    user_channel_node->program_number   = pmt_table_one_program->program_number;
+    user_channel_node->program_map_PID  = program_map_pid;
+
+    P_TS_PMT_Stream tmp = NULL; 
+    unsigned pmt_stream_count = 0;
+    
+    //get the stream_type and elementary_pid infomation of this program_number.
+    list_for_each(pos, &__ts_pmt_stream_list.list)
+    {
+        tmp = list_entry(pos,TS_PMT_Stream, list);
+        if(tmp->program_number == user_channel_node->program_number)
+        {
+            user_channel_node->pmt_stream_list[pmt_stream_count].stream_type    = tmp->stream_type;
+            user_channel_node->pmt_stream_list[pmt_stream_count].elementary_PID = tmp->elementary_PID;
+            pmt_stream_count++;
+        }
+    }
+
+    user_channel_node->pmt_stream_count  = pmt_stream_count + 1;
+
+    return user_channel_node;
+}
+
+
+
+
+
+
+SDT_SERVICE * search_given_sdt_program_num(unsigned short program_number,
+        TS_SDT_TABLE *sdt_table_head)
+{
+    TS_SDT_TABLE *tmp = pSdtTable;
+    unsigned int *ptmp = (unsigned int *)tmp;
+    SDT_SERVICE *result_service = NULL;
+
+    while(NULL != tmp && (ptmp[0] | ptmp[1]) != 0)
+    {
+        result_service = __search_sdt_service_onesection(tmp->first_sdt_service, program_number);
         
-    unsigned char * pPacketBuffer = (unsigned char *)malloc(packetLength);
-    unsigned char * pFreebuffer = pPacketBuffer;
+        if(NULL != result_service)
+        {
+            uprintf("Find need sdt_service\n");
+            return result_service;
+        }
+        
+        tmp++;
+        //to judge if goto the end. last_8 byte.
+        ptmp = (unsigned int *)tmp;
+    }
+
+    return NULL;
+
+
+}
+
+
+
+int setup_user_channel_list(FILE *pFile, unsigned int packetLength)
+{
+    
+    //1.PAT table parse
+    init_ts_pat_program_list();
+    TS_PAT_TABLE *pat_table_head = parse_pat_table(pFile, packetLength);
+    show_pat_program_info();
+        
+    //2. SDT table parse.
+    TS_SDT_TABLE * sdt_table_head = parse_sdt_table(pFile, packetLength,
+            TABLE_ID_SDT_ACTUAL);
+    SDT_SERVICE * sdt_service_node = NULL;
+
+    //3.PMT table parse. And setup the user_channel_info
+    struct list_head *pos;
+    P_TS_PAT_Program tmp_pat_program = NULL;
+    USER_CHANNEL_INFO * user_channel_node = NULL;
 
     list_for_each(pos, &__ts_pat_program_list.list)
     {
         tmp_pat_program = list_entry(pos,TS_PAT_Program, list);
+        
         TS_PMT_TABLE *pmt_table_one_program_head = parse_pmt_table_one_program(pFile, packetLength,
                 tmp_pat_program->program_number, tmp_pat_program->program_map_pid);
-        //we only reserve the __ts_pmt_stream_list, others we will free;
-        //need optimized  1 meaning reserved
+        
+        //allocate and init some infor for user_channel_info
+        user_channel_node = alocate_and_init_user_channel_node(pmt_table_one_program_head,
+                tmp_pat_program->program_map_pid);
+
+        sdt_service_node = search_given_sdt_program_num(tmp_pat_program->program_number, sdt_table_head);
+        
+
+        list_add(&(user_channel_node->list),&(__ts_user_channel_info_list.list)); 
+
+        //free pmt table info
         free_pmt_table_one_program(pmt_table_one_program_head, 1);
     }
 
-//    show_pmt_stream_info();
-
-    free(pFreebuffer);
-    free(pFreetmp);
+    
     
     fseek(pFile, 0, SEEK_SET);
+
+    //free_pat_table releated memory
+    free_pat_table(pat_table_head);
+    
+    //free_sdt_table releated memory
+    free_sdt_table(sdt_table_head);
     
     return 0;
 }
+
 
 
 
