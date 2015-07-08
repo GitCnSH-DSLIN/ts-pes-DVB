@@ -25,7 +25,7 @@ typedef user_channel_info{
 
     unsigned short program_number;
     unsigned short program_map_PID;
-    unsigned short tramsport_stream_id ; //SDT->transport_stream_id   === NIT->TRANSPORT_STREAM->transport_stream_id
+    unsigned short transport_stream_id ; //SDT->transport_stream_id   === NIT->TRANSPORT_STREAM->transport_stream_id
     unsigned short freq;
                         
     unsigned char service_name_length;
