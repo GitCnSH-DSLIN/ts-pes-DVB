@@ -124,23 +124,22 @@ int parse_pmt_table_onesection(unsigned char * pBuffer, TS_PMT_TABLE * psiPMT,
         // Get stream type and PID
 
     //judge to add to __ts_pmt_stream_list or not.
-    tmp =  (P_TS_PMT_Stream)malloc(sizeof(TS_PMT_Stream));
-    freetmp = tmp;
     list_for_each(pos,&__ts_pmt_stream_list.list)
     {
         tmp = list_entry(pos,TS_PMT_Stream, list);
 
         if(tmp->program_number == programNumber)
         {
-            free(freetmp);
             return 0;
         }
     }
+    
 
     //section_length + 2 --> pmt start.  -4 --> CRC
     for ( ; pos_offset <= (psiPMT->section_length + 2 ) - 4; pos_offset += 5 )  
     {  
         tmp = (P_TS_PMT_Stream)malloc(sizeof(TS_PMT_Stream));
+        memset(tmp, 0, sizeof(TS_PMT_Stream));
         tmp->stream_type    =  buffer[pos_offset];  
         tmp->reserved_5     =   buffer[pos_offset+1] >> 5;  
         tmp->elementary_PID =  ((buffer[pos_offset+1] << 8) | buffer[pos_offset+2]) & 0x1FFF;  

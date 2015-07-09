@@ -1,13 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ts_list.h>
 #include <tslib.h>
-#include <pat.h>
-#include <pmt.h>
 #include <print_debug.h>
-#include <sdt.h>
-
+#include <user_channel.h>
 
 int main(int argc, char * argv[])
 {
@@ -22,12 +18,8 @@ int main(int argc, char * argv[])
     }
 
     /*************************************************************************/
-    init_ts_pat_program_list();    
-    
-    TS_PAT_TABLE *pat_table_head = parse_pat_table(pFile, packetLength);
-    //show_pat_table_info(pat_table_head);
-    show_pat_program_info();
-   
+    setup_user_channel_list(pFile, packetLength);
+    show_user_channel_info_list();
     
     //init_ts_pmt_stream_list();
     //setup_pmt_stream_list(pFile, packetLength);
@@ -35,7 +27,6 @@ int main(int argc, char * argv[])
     //show_pmt_stream_info();
 
 
-    free_pat_table(pat_table_head);
     fclose(pFile);
 
 
