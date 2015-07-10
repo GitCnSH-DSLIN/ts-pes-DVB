@@ -304,6 +304,23 @@ TS_NIT_TABLE * setup_user_channel_list(FILE *pFile, unsigned int packetLength, i
 }
 
 
+
+void free_user_channel_list_info()
+{
+    struct list_head *pos, *n;
+    USER_CHANNEL_INFO * tmp = NULL;
+
+    list_for_each_safe(pos, n, &(__ts_user_channel_list.list))
+    {
+        tmp = list_entry(pos, USER_CHANNEL_INFO, list);
+        list_del_init(pos);
+        free(tmp);
+        tmp = NULL;
+    }
+}
+
+
+
 int show_user_channel_info_list(void)
 {
     struct list_head *pos;
@@ -327,6 +344,7 @@ int show_user_channel_info_list(void)
         uprintf("Service_name       :   %s\n",tmp->service_name);
         uprintf("Frequence          :   %d(0x%X)\n",tmp->freq, tmp->freq);
         uprintf("Program_streamcount:   %d\n",tmp->program_stream_count);
+
         int i=0;
         for(i=0; i<tmp->program_stream_count;i++)
         {

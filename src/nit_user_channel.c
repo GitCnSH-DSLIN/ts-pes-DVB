@@ -1,7 +1,7 @@
 /*********************************************************************
 *
 * Filename      :   nit_user_channel.c
-* Description   :   fundamental operation of  user channel info
+* Description   :   from nit table to get all of user channel info from different frequency
 * Edited by     :   Jensen Zhen(JensenZhen@zhaoxin.com)
 * Note          :   when we search from NIT Table to get all of the freqence
 *                   of user_channel, Firstly we must set a default frequence
@@ -62,7 +62,7 @@ char *__itoa(int num, char *str, int radix)
     return str;
 }
 
-
+/*Sub core function*/
 void find_user_channel_from_given_freq(FILE *pFile, unsigned int packetLength, unsigned int given_freq)
 {
     init_ts_pat_program_list();
@@ -202,8 +202,82 @@ FILE * __adjust_specify_freq(unsigned int frequency)
     
     return pCurFile;
 }
-    
 
+
+int write_file_user_channel_info()
+{
+    FILE * pSaveFile;
+
+    if((pSaveFile = fopen("/home/jensen/workspace/TsFile/user_channel_info","wb")) == NULL)
+    {
+        uprintf("Open file failed\n");
+        return -1;
+    }
+    
+    struct list_head *pos;
+    USER_CHANNEL_INFO * tmp = NULL;
+
+    if(list_empty(&(__ts_user_channel_list.list)))
+    {
+        uprintf("Empty list \n");
+        return;
+    }
+
+    unsigned short channel_id = 0;
+    list_for_each(pos, &(__ts_user_channel_list.list))
+    {
+        tmp = list_entry(pos, USER_CHANNEL_INFO, list);
+        if(1 != fwrite(tmp,sizeof(USER_CHANNEL_INFO),1,pSaveFile))
+        {
+            uprintf("fwrite failed \n");
+            return -1;
+        }
+    }
+    
+    //after write the user_channel_list into file, free user_channel_list.
+    free_user_channel_list_info();
+
+    fclose(pSaveFile);
+    
+    return 0;
+}
+
+int read_user_channel_from_storefile()
+{
+    
+    FILE * pSaveFile;
+
+    if((pSaveFile = fopen("/home/jensen/workspace/TsFile/user_channel_info","rb")) == NULL)
+    {
+        uprintf("Open file failed\n");
+        return -1;
+    }
+    unsigned char * buffer = (unsigned char *)malloc(sizeof(USER_CHANNEL_INFO));
+    memset(buffer, 0, sizeof(USER_CHANNEL_INFO));
+
+    unsigned step_length = sizeof(USER_CHANNEL_INFO);
+    unsigned char * b = NULL;
+    USER_CHANNEL_INFO * tmp = NULL;
+
+    init_ts_user_channel_list();
+
+    //write low first, then high.
+    while(fread(buffer,step_length , 1, pSaveFile) == 1)
+    {   
+        tmp = (USER_CHANNEL_INFO *)malloc(sizeof(USER_CHANNEL_INFO));
+        memset(tmp, 0, sizeof(USER_CHANNEL_INFO));
+        memcpy((unsigned char *)tmp,buffer, sizeof(USER_CHANNEL_INFO));
+        list_add(&(tmp->list), &(__ts_user_channel_list.list)); 
+    }
+
+    free(buffer);
+    fclose(pSaveFile);
+    return 0;
+}
+
+
+
+/*Core function*/
 int setup_user_channel_list_from_nit(FILE *pFile, unsigned int packetLength, unsigned int default_freq)
 {
     TS_NIT_TABLE * nit_table_head = setup_user_channel_list(pFile, packetLength, 1);
@@ -237,7 +311,8 @@ int setup_user_channel_list_from_nit(FILE *pFile, unsigned int packetLength, uns
             find_user_channel_from_given_freq(curFile, packetLength,tmp->frequency);
         }
     }
-
+    
+    
     //free nit_table memory
     free_nit_table(nit_table_head);
     nit_table_head = NULL;
@@ -245,6 +320,7 @@ int setup_user_channel_list_from_nit(FILE *pFile, unsigned int packetLength, uns
     //free nit_freq_list
     free_nit_freq_list_info();
 }
+
 
 void free_nit_freq_list_info()
 {
@@ -259,6 +335,7 @@ void free_nit_freq_list_info()
         tmp = NULL;
     }
 }
+
 
 int show_nit_freq_list_info(void)
 {

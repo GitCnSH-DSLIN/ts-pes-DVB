@@ -21,7 +21,10 @@ int main(int argc, char * argv[])
     /*************************************************************************/
     setup_user_channel_list_from_nit(pFile,packetLength, 0x2030000);
     show_user_channel_info_list();
-    
+    write_file_user_channel_info();   
+    uprintf("*********************************************************************************************\n");
+    read_user_channel_from_storefile();
+    show_user_channel_info_list();
 
     fclose(pFile);
     return 0;

@@ -14,12 +14,12 @@
 #include <nit.h>
 
 #define MAX_SERVICE_NAME_SIZE   (32)
-#define MAX_PROGRAM_STREAM_SIZE     (16)
+#define MAX_PROGRAM_STREAM_SIZE     (8)
 
 
 typedef struct program_stream_info{
 
-    unsigned char stream_type;
+    unsigned short stream_type;
     unsigned short elementary_PID;
 
 }PROGRAM_STREAM_INFO,P_PROGRAM_STREAM_INFO;
@@ -29,10 +29,10 @@ typedef struct user_channel_info{
 
     unsigned short program_number;
     unsigned short program_map_PID;
-    unsigned short transport_stream_id ; //SDT->transport_stream_id   === NIT->TRANSPORT_STREAM->transport_stream_id
+    unsigned short transport_stream_id ;     //SDT->transport_stream_id   === NIT->TRANSPORT_STREAM->transport_stream_id
     unsigned int freq;
                         
-    unsigned char service_name_length;
+    unsigned int service_name_length;
     unsigned char service_name[MAX_SERVICE_NAME_SIZE];
     
     unsigned char program_stream_count;
@@ -42,6 +42,8 @@ typedef struct user_channel_info{
     struct list_head list;// userd for freq global list.
 
 }USER_CHANNEL_INFO, *P_USER_CHANNEL_INFO;
+
+
 
 USER_CHANNEL_INFO __ts_user_channel_list;
 
@@ -58,6 +60,8 @@ unsigned int locate_user_channel_freq(unsigned short transport_stream_id,
         TS_NIT_TABLE * nit_table_head);
 
 TS_NIT_TABLE * setup_user_channel_list(FILE *pFile, unsigned int packetLength, int reserved_nit_flag);
+
+void free_user_channel_list_info();
 
 int show_user_channel_info_list(void);
 
