@@ -19,7 +19,6 @@
 #include <print_debug.h>
 
 
-USER_CHANNEL_INFO __ts_user_channel_list;
 
 /*  
  *  Function    : Init the global __ts_pmt_stream_list
@@ -96,8 +95,7 @@ SDT_SERVICE * search_given_sdt_program_num(unsigned short program_number, TS_SDT
         
         if(NULL != result_service)
         {
-            uprintf("Find need sdt_service for user_channel\n");
-            
+            //uprintf("Find need sdt_service for user_channel\n");
             return result_service;
         }
         tmp++;
@@ -230,7 +228,7 @@ unsigned int locate_user_channel_freq(unsigned short transport_stream_id,
 }
 
 
-int setup_user_channel_list(FILE *pFile, unsigned int packetLength)
+TS_NIT_TABLE * setup_user_channel_list(FILE *pFile, unsigned int packetLength, int reserved_nit_flag)
 {
     
     init_ts_user_channel_list();
@@ -277,7 +275,7 @@ int setup_user_channel_list(FILE *pFile, unsigned int packetLength)
         list_add(&(user_channel_node->list), &(__ts_user_channel_list.list)); 
 
         //free pmt table info
-        free_pmt_table_one_program(pmt_table_one_program_head, 1);
+        free_pmt_table_one_program(pmt_table_one_program_head, 0);
     }
 
     
@@ -286,14 +284,23 @@ int setup_user_channel_list(FILE *pFile, unsigned int packetLength)
 
     //free_pat_table releated memory
     free_pat_table(pat_table_head);
-    
+    pat_table_head = NULL;
+
     //free_sdt_table releated memory
     free_sdt_table(sdt_table_head);
+    sdt_table_head = NULL;
     
+
     //free_nit_table releated memory
-    free_nit_table(nit_table_head);
-    
-    return 0;
+    //reserved_nit_flag : 1 reserved,  0 free;
+    if(0 == reserved_nit_flag)
+    {
+        free_nit_table(nit_table_head);
+        nit_table_head = NULL;
+        return NULL;
+    }
+    else
+        return nit_table_head;
 }
 
 

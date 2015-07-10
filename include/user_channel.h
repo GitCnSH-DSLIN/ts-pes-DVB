@@ -43,6 +43,8 @@ typedef struct user_channel_info{
 
 }USER_CHANNEL_INFO, *P_USER_CHANNEL_INFO;
 
+USER_CHANNEL_INFO __ts_user_channel_list;
+
 void init_ts_user_channel_list(void);
 
 USER_CHANNEL_INFO * alocate_and_init_user_channel_node(TS_PMT_TABLE *  pmt_table_one_program,
@@ -55,7 +57,7 @@ int init_user_channel_name_info(SDT_SERVICE *sdt_service, USER_CHANNEL_INFO *use
 unsigned int locate_user_channel_freq(unsigned short transport_stream_id, 
         TS_NIT_TABLE * nit_table_head);
 
-int setup_user_channel_list(FILE *pFile, unsigned int packetLength);
+TS_NIT_TABLE * setup_user_channel_list(FILE *pFile, unsigned int packetLength, int reserved_nit_flag);
 
 int show_user_channel_info_list(void);
 

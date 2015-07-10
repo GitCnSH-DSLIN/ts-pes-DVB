@@ -226,6 +226,7 @@ void free_pat_program_info_onesection(TS_PAT_TABLE * pat_table)
 }
 
 
+//when we free the pat_table, we also free node from __ts_pat_program_list
 void free_pat_table(TS_PAT_TABLE * pat_table_header)
 {
     TS_PAT_TABLE *tmp = pat_table_header;
